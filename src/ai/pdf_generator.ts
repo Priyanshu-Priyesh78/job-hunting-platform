@@ -31,42 +31,39 @@ export class ResumePdfGenerator {
 <head>
   <meta charset="utf-8">
   <title>Priyanshu Priyesh - Resume</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: "Nimbus Sans L", "Nimbus Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
-      color: #0f172a;
+      color: #000000;
       background: #ffffff;
       -webkit-font-smoothing: antialiased;
-      line-height: 1.4;
+      line-height: 1.28;
+      font-size: 9.46pt;
     }
-    .header { text-align: center; margin-bottom: 10px; border-bottom: 1.5px solid #0f172a; padding-bottom: 8px; }
-    .name { font-size: 20px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; margin: 0 0 2px 0; }
-    .headline { font-size: 11px; font-weight: 600; color: #334155; margin-bottom: 3px; }
-    .contact { font-size: 10.5px; color: #475569; }
-    .section-title {
-      font-size: 11.5px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      border-bottom: 1px solid #cbd5e1;
-      padding-bottom: 2px;
-      margin-top: 10px;
-      margin-bottom: 5px;
-      color: #0f172a;
+    b, strong {
+      font-weight: 700;
+      color: #000000;
     }
-    .summary-text { font-size: 10.5px; line-height: 1.45; color: #334155; text-align: justify; margin: 0; }
-    .skill-row { font-size: 10.5px; line-height: 1.45; margin-bottom: 2px; color: #334155; }
-    .skill-label { font-weight: 700; color: #0f172a; }
-    ul { margin: 0; padding-left: 18px; font-size: 10.5px; line-height: 1.45; color: #334155; }
-    li { margin-bottom: 3px; }
-    .exp-header { display: flex; justify-content: space-between; align-items: baseline; }
-    .exp-company { font-size: 12.5px; font-weight: 700; color: #0f172a; }
-    .exp-title { font-size: 11.5px; font-weight: 600; color: #1e293b; margin: 1px 0 3px 0; }
-    .exp-date { font-size: 11px; color: #475569; }
+    i, em {
+      font-style: italic;
+    }
+    p {
+      text-align: justify;
+      margin: 0 0 6px 0;
+    }
+    ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 9.46pt;
+      line-height: 1.25;
+    }
+    li {
+      margin-bottom: 2.5px;
+      text-align: justify;
+    }
   </style>
 </head>
 <body>
@@ -89,10 +86,10 @@ export class ResumePdfGenerator {
         format: 'A4',
         printBackground: true,
         margin: {
-          top: '0.35in',
-          bottom: '0.35in',
-          left: '0.45in',
-          right: '0.45in'
+          top: '0.55in',
+          bottom: '0.55in',
+          left: '0.55in',
+          right: '0.55in'
         }
       });
 
