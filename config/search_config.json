@@ -1,0 +1,84 @@
+{
+  "targetRoles": [
+    "DevOps Engineer",
+    "Site Reliability Engineer",
+    "SRE",
+    "Cloud Engineer",
+    "Platform Engineer",
+    "Infrastructure Engineer",
+    "Kubernetes Engineer"
+  ],
+  "experience": {
+    "minYears": 0,
+    "maxYears": 2,
+    "preferred": "0-2 years"
+  },
+  "locations": [
+    "Bengaluru",
+    "Bangalore",
+    "Hyderabad",
+    "Pune",
+    "Delhi NCR",
+    "Gurgaon",
+    "Noida",
+    "Mumbai",
+    "Remote",
+    "India"
+  ],
+  "keywords": [
+    "Amazon Web Services (AWS)",
+    "Amazon Elastic Kubernetes Service (Amazon EKS)",
+    "Cloud Infrastructure",
+    "Terraform",
+    "Infrastructure as Code (IaC)",
+    "Terragrunt",
+    "AWS Networking",
+    "Linux",
+    "Kubernetes",
+    "Docker",
+    "Helm",
+    "Platform Engineering",
+    "Gloo Gateway",
+    "Kubernetes RBAC",
+    "Autoscaling",
+    "GitOps",
+    "Site Reliability Engineering (SRE)",
+    "Grafana",
+    "Prometheus",
+    "Monitoring",
+    "Alerting",
+    "Root Cause Analysis",
+    "Argo CD",
+    "Continuous Integration and Continuous Delivery (CI/CD)",
+    "GitHub Actions",
+    "Jsonnet",
+    "Atlantis",
+    "Infrastructure Automation",
+    "AWS Identity and Access Management (IAM)",
+    "AWS WAF",
+    "Secrets Management",
+    "CloudWatch",
+    "Fluent Bit",
+    "OpenSearch",
+    "Kibana",
+    "Production Operations"
+  ],
+  "platforms": [
+    "linkedin",
+    "naukri",
+    "indeed",
+    "wellfound",
+    "instahyre",
+    "glassdoor",
+    "foundit",
+    "hirect",
+    "upler"
+  ],
+  "chromeExecutablePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "scraping": {
+    "headless": true,
+    "delayBetweenRequestsMs": 2500,
+    "maxJobsPerPlatform": 25
+  }
+}
+

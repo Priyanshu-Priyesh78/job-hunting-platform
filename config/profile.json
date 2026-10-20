@@ -1,0 +1,77 @@
+{
+  "personal": {
+    "fullName": "Priyanshu Priyesh",
+    "firstName": "Priyanshu",
+    "lastName": "Priyesh",
+    "email": "priyanshupriyesh78@gmail.com",
+    "phone": "+91 8809003179",
+    "phoneNumberRaw": "8809003179",
+    "linkedin": "https://linkedin.com/in/priyanshu-priyesh-187340233",
+    "github": "https://github.com",
+    "currentLocation": "Indore, India",
+    "preferredLocations": ["Bangalore", "Hyderabad", "Pune", "Delhi NCR", "Gurgaon", "Noida", "Mumbai", "Remote"],
+    "workAuthorization": "Citizen of India",
+    "noticePeriodDays": 15,
+    "noticePeriodText": "Immediate / 15-30 days",
+    "willingToRelocate": true
+  },
+  "headline": "Software Engineer / SRE — AWS — Kubernetes — Terraform — Platform Engineering",
+  "summary": "Software Engineer / SRE with experience operating production-grade, globally distributed AWS and Kubernetes platforms supporting a large-scale CPaaS environment. Hands-on with Amazon EKS, Terraform/Terragrunt, Helm, ArgoCD/GitOps, Gloo Gateway, AWS networking and security, observability, autoscaling, incident response, and infrastructure reliability. Experienced in operating 14+ production EKS clusters across 7 AWS regions and 280+ nodes, leading platform upgrades and security initiatives, operating Kubernetes-based API gateway infrastructure, standardizing multi-account infrastructure, and improving reliability, operational efficiency, and cloud resource utilization.",
+  "experienceYears": 1.5,
+  "experienceLevel": "0-2 years",
+  "education": [
+    {
+      "institution": "Lakshmi Narain College of Technology (LNCT)",
+      "degree": "Bachelor of Technology",
+      "fieldOfStudy": "Computer Science Engineering",
+      "location": "Bhopal, India",
+      "graduationYear": "2025",
+      "cgpa": "8.45/10"
+    }
+  ],
+  "workExperience": [
+    {
+      "company": "Revent Labs",
+      "title": "Software Engineer I",
+      "location": "Indore, India",
+      "startDate": "January 2025",
+      "endDate": "Present",
+      "isCurrent": true,
+      "highlights": [
+        "Owned 14+ production EKS clusters spanning 7 AWS regions and 280+ nodes supporting a globally distributed CPaaS platform, leading quarterly platform upgrades across EKS versions, node AMIs, CSI drivers, load balancer controllers, autoscaling, certificate management, and secrets management while maintaining zero customer-facing downtime.",
+        "Worked as part of the Gateway Engineering team responsible for operating the Kubernetes-based API gateway layer, managing production Gloo Gateway Proxy, RateLimit, and ExtAuth pods across multi-region EKS clusters and troubleshooting gateway traffic, authentication, authorization, rate limiting, and upstream connectivity issues.",
+        "Led production incident investigation and RCA across Kubernetes, gateway, networking, authentication, logging, and deployment systems, tracing failures across infrastructure and application layers, driving root-cause remediation, and improving platform reliability and operational resilience.",
+        "Managed multi-region AWS networking and security infrastructure across 7 regions, including AWS WAF, Global Accelerator, ALB, Route 53, and Shield Advanced; built centralized S3/Athena log analytics for WAF, ALB, and Global Accelerator traffic across Development, QA, and Production environments.",
+        "Managed and standardized Terraform/Terragrunt infrastructure across 13+ projects, multiple AWS accounts, and environments, migrating teams toward reusable infrastructure modules, eliminating IaC anti-patterns, and reducing configuration drift through Atlantis-based CI/CD workflows.",
+        "Drove security and compliance initiatives including vendor CVE remediation, mandatory production security rollouts, and regulatory audit logging across 21 GitOps instances, coordinating infrastructure changes while maintaining production availability.",
+        "Delivered Kubernetes cost attribution across environments by integrating clusters with the organization's FinOps platform using custom Helm automation and Terraform-based regional configuration; improved resource efficiency through utilization-driven rightsizing and migration to better-suited AWS node types.",
+        "Standardized operational practices through production runbooks, investigation queries, and internal engineering training, enabling more consistent troubleshooting and faster incident response across the wider engineering team.",
+        "Owned the platform observability ecosystem across Kubernetes, applications, and AWS infrastructure, covering metrics, logging, alerting, dashboards, and operational visibility.",
+        "Designed and maintained the metrics and alerting platform using Prometheus-style scraping, VictoriaMetrics, Grafana, and Alertmanager, integrated with Slack and OpsGenie; established 15+ production P1–P3 alerts covering authentication, Kubernetes health, API Gateway traffic, load balancers, and autoscaling systems.",
+        "Maintained centralized logging using Fluent Bit, S3, OpenSearch, and Kibana, providing end-to-end visibility across application, Kubernetes, and AWS infrastructure layers.",
+        "Developed 7+ Grafana dashboards and CloudWatch-integrated views for Kubernetes, ALB, WAF, Global Accelerator, authentication, and platform health, mapping operational alerts directly to dashboards for faster incident triage."
+      ]
+    }
+  ],
+  "skills": {
+    "cloud": ["AWS", "Amazon EKS", "EC2", "VPC", "ALB", "WAF", "Global Accelerator", "Shield Advanced", "Route 53", "CloudFront", "API Gateway", "Lambda", "S3", "Kinesis", "Athena", "Secrets Manager", "SSM", "CloudWatch", "ACM"],
+    "kubernetes": ["Kubernetes", "Amazon EKS", "Docker", "Helm", "Gloo Gateway", "Kubernetes RBAC", "HPA", "CSI Drivers", "Load Balancer Controllers", "RateLimit", "ExtAuth", "Autoscaling", "Cluster Upgrades"],
+    "iac": ["Terraform", "Terragrunt", "Atlantis", "reusable Terraform modules", "multi-account infrastructure"],
+    "cicd": ["ArgoCD", "GitHub Actions", "Atlantis", "Jsonnet", "GitOps", "automated infrastructure"],
+    "observability": ["Prometheus", "VictoriaMetrics", "Grafana", "Alertmanager", "Fluent Bit", "OpenSearch", "Kibana", "CloudWatch", "Metrics", "Logging", "Alerting", "Incident Response", "RCA", "Runbooks", "Reliability Engineering"],
+    "security": ["IAM", "WAF", "Shield Advanced", "Secrets Management", "TLS/Certificates", "CVE Remediation", "Security Compliance", "Jira", "Opsgenie", "Okta", "Confluence"],
+    "languages": ["C++", "Bash", "Linux", "Git", "GitHub"]
+  },
+  "standardAnswers": {
+    "yearsOfExperienceTotal": "1.5",
+    "yearsOfExperienceAWS": "1.5",
+    "yearsOfExperienceKubernetes": "1.5",
+    "yearsOfExperienceTerraform": "1.5",
+    "yearsOfExperienceDocker": "2",
+    "yearsOfExperienceLinux": "2",
+    "whyHireMe": "I have hands-on experience running 14+ production EKS clusters across 7 AWS regions with 280+ nodes, managing zero-downtime upgrades, Gloo API Gateway, GitOps via ArgoCD, and automated IaC with Terraform/Terragrunt. I bring solid SRE incident response discipline and deep AWS observability expertise.",
+    "relocation": "Yes, I am open to relocating to Bangalore, Hyderabad, Pune, Mumbai, or Delhi NCR.",
+    "workMode": "I am open to Remote, Hybrid, or On-site roles."
+  }
+}
+

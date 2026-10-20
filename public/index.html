@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobHunter AI — Priyanshu Priyesh (DevOps / SRE)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+            surface: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0b0f19; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-card { background: #131d2f; border: 1px solid #1e293b; }
+    .glass-card:hover { border-color: #3b82f6; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- TOP NAVBAR -->
+  <header class="glass sticky top-0 z-40 border-b border-slate-800 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+        <i data-lucide="zap" class="w-6 h-6 text-white"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold text-white flex items-center gap-2">
+          JobHunter AI
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">DevOps / SRE</span>
+        </h1>
+        <p class="text-xs text-slate-400">Priyanshu Priyesh • AWS, EKS, Terraform, GitOps</p>
+      </div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="flex items-center space-x-3">
+      <button onclick="openSheetsModal()" class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm font-medium border border-slate-700 transition">
+        <i data-lucide="table" class="w-4 h-4 text-emerald-400"></i>
+        <span>Google Sheets</span>
+        <span id="sheetsStatusDot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+      </button>
+
+      <button onclick="openScanModal()" class="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-sm font-semibold text-white shadow-lg shadow-indigo-600/30 transition">
+        <i data-lucide="compass" class="w-4 h-4"></i>
+        <span>Run Scanner</span>
+      </button>
+
+      <button onclick="fetchJobs()" title="Refresh" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+        <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- SCANNING NOTIFICATION BANNER -->
+  <div id="scanningBanner" class="hidden bg-gradient-to-r from-blue-900/60 to-indigo-900/60 border-b border-blue-500/30 px-6 py-2.5 flex items-center justify-between text-sm">
+    <div class="flex items-center space-x-3">
+      <span class="relative flex h-3 w-3">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+      </span>
+      <span id="scanStatusText" class="font-medium text-blue-200">Scanner active in background...</span>
+    </div>
+    <span class="text-xs text-blue-300/80">Updating jobs.csv & Sheet</span>
+  </div>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 space-y-6">
+
+    <!-- STATS OVERVIEW -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="glass-card p-5 rounded-2xl">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+          <span>Total Tracked</span>
+          <i data-lucide="briefcase" class="w-4 h-4 text-blue-400"></i>
+        </div>
+        <div id="statTotal" class="text-3xl font-extrabold text-white">0</div>
+        <div class="text-xs text-slate-400 mt-1">across all job boards</div>
+      </div>
+
+      <div class="glass-card p-5 rounded-2xl border-l-4 border-l-emerald-500">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+          <span>Highly Recommended</span>
+          <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+        </div>
+        <div id="statHighMatch" class="text-3xl font-extrabold text-emerald-400">0</div>
+        <div class="text-xs text-slate-400 mt-1">≥ 80% match score</div>
+      </div>
+
+      <div class="glass-card p-5 rounded-2xl border-l-4 border-l-indigo-500">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+          <span>Applications Submitted</span>
+          <i data-lucide="send" class="w-4 h-4 text-indigo-400"></i>
+        </div>
+        <div id="statApplied" class="text-3xl font-extrabold text-indigo-400">0</div>
+        <div class="text-xs text-slate-400 mt-1">marked applied</div>
+      </div>
+
+      <div class="glass-card p-5 rounded-2xl border-l-4 border-l-amber-500">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+          <span>Interviews</span>
+          <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div id="statInterview" class="text-3xl font-extrabold text-amber-400">0</div>
+        <div class="text-xs text-slate-400 mt-1">pipeline active</div>
+      </div>
+    </div>
+
+    <!-- FILTER & SEARCH BAR -->
+    <div class="glass p-4 rounded-2xl flex flex-wrap gap-4 items-center justify-between border border-slate-800">
+      <div class="flex items-center space-x-3 flex-1 min-w-[280px]">
+        <div class="relative w-full">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
+          <input type="text" id="searchInput" oninput="renderJobs()" placeholder="Search title, company, skills, or location..."
+            class="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
+        </div>
+      </div>
+
+      <!-- STATUS TABS -->
+      <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs font-medium space-x-1">
+        <button onclick="setStatusFilter('ALL')" id="tabALL" class="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-semibold transition">All</button>
+        <button onclick="setStatusFilter('HIGH')" id="tabHIGH" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">High Match</button>
+        <button onclick="setStatusFilter('NEW')" id="tabNEW" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">New</button>
+        <button onclick="setStatusFilter('APPLIED')" id="tabAPPLIED" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Applied</button>
+        <button onclick="setStatusFilter('INTERVIEW')" id="tabINTERVIEW" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Interview</button>
+      </div>
+
+      <!-- PLATFORM SELECT -->
+      <select id="platformFilter" onchange="renderJobs()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none">
+        <option value="ALL">All Platforms</option>
+        <option value="linkedin">LinkedIn</option>
+        <option value="naukri">Naukri</option>
+        <option value="indeed">Indeed</option>
+        <option value="wellfound">Wellfound</option>
+        <option value="instahyre">Instahyre</option>
+      </select>
+    </div>
+
+    <!-- JOBS LIST / CARDS -->
+    <div id="jobsContainer" class="space-y-3">
+      <!-- Dynamically filled -->
+      <div class="text-center py-16 text-slate-500">Loading jobs...</div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: RUN SCAN -->
+  <div id="scanModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="compass" class="w-5 h-5 text-blue-500"></i>
+          Trigger New Job Scan
+        </h3>
+        <button onclick="closeScanModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="space-y-4 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Target Role</label>
+          <input type="text" id="scanRoleInput" value="DevOps Engineer" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Location</label>
+          <input type="text" id="scanLocationInput" value="India" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Posted Time Filter</label>
+          <select id="scanTimeFilter" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+            <option value="6h">Past 6 Hours (Fresh Openings)</option>
+            <option value="24h">Past 24 Hours</option>
+            <option value="week" selected>Past Week (7 Days)</option>
+          </select>
+          <p class="text-xs text-slate-500 mt-1">Deduplication prevents re-adding jobs you have already tracked.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Platforms</label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" id="plat_linkedin" checked class="rounded text-blue-600">
+              <span>LinkedIn</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" id="plat_naukri" checked class="rounded text-blue-600">
+              <span>Naukri</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" id="plat_indeed" checked class="rounded text-blue-600">
+              <span>Indeed</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" id="plat_wellfound" checked class="rounded text-blue-600">
+              <span>Wellfound (Startups)</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" id="plat_instahyre" checked class="rounded text-blue-600">
+              <span>Instahyre</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="scanEnableAI" checked class="rounded text-blue-600">
+          <label for="scanEnableAI" class="text-xs text-slate-300">Run Gemini Deep Analysis & Match Scoring on top results</label>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-3 border-t border-slate-800">
+        <button onclick="closeScanModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm">Cancel</button>
+        <button onclick="triggerScan()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30">
+          Start Scanning
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RESUME CUSTOMIZER / ATS FIXER -->
+  <div id="resumeModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-3xl rounded-2xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-400"></i>
+            AI Resume Customizer & Pitch Generator
+          </h3>
+          <p id="resumeModalJobInfo" class="text-xs text-slate-400 mt-0.5">Role at Company</p>
+        </div>
+        <button onclick="closeResumeModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div id="resumeModalLoading" class="py-16 text-center space-y-3">
+        <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <p class="text-sm text-slate-300">Gemini is analyzing the JD, calculating keyword gaps, and tailoring your resume...</p>
+      </div>
+
+      <div id="resumeModalContent" class="hidden overflow-y-auto space-y-5 pr-2 flex-1">
+        <!-- ATS Keywords Analysis -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-emerald-950/30 border border-emerald-800/40 p-3 rounded-xl">
+            <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Matched ATS Keywords
+            </div>
+            <div id="tailorMatchedKeywords" class="flex flex-wrap gap-1.5 text-xs text-emerald-300"></div>
+          </div>
+          <div class="bg-amber-950/30 border border-amber-800/40 p-3 rounded-xl">
+            <div class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Missing / Emphasize
+            </div>
+            <div id="tailorMissingKeywords" class="flex flex-wrap gap-1.5 text-xs text-amber-300"></div>
+          </div>
+        </div>
+
+        <!-- Tailored Summary -->
+        <div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">ATS-Optimized Summary</div>
+          <div id="tailorSummaryText" class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl text-sm text-slate-200"></div>
+        </div>
+
+        <!-- Tailored Experience Bullets -->
+        <div>
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">High-Impact Experience Bullets (Swap into Revent Labs)</div>
+          <ul id="tailorBulletsList" class="space-y-2 bg-slate-950 border border-slate-800 p-3.5 rounded-xl text-sm text-slate-200 list-disc list-inside"></ul>
+        </div>
+
+        <!-- Tailored Cover Letter / Note -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tailored Cover Letter / Application Note</span>
+            <button onclick="copyCoverLetter()" class="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Pitch
+            </button>
+          </div>
+          <div id="tailorPitchText" class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl text-sm text-slate-200 whitespace-pre-line"></div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-3 border-t border-slate-800">
+        <button onclick="closeResumeModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GOOGLE SHEETS SYNC -->
+  <div id="sheetsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="table" class="w-5 h-5 text-emerald-400"></i>
+          Google Sheets Integration
+        </h3>
+        <button onclick="closeSheetsModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="space-y-4 text-sm">
+        <p class="text-xs text-slate-400">
+          Your jobs are always preserved in <code class="bg-slate-950 px-1 py-0.5 rounded text-blue-400">jobs.csv</code>.
+          Connect your Google Sheet below to automatically mirror all scanned jobs in real time:
+        </p>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Google Sheet Webhook URL (Easiest)</label>
+          <input type="text" id="sheetsWebhookInput" placeholder="https://script.google.com/macros/s/..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs">
+          <p class="text-[11px] text-slate-500 mt-1">See <code class="text-blue-400">docs/GOOGLE_SHEETS_SETUP.md</code> for the 10-line Apps Script snippet.</p>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <button onclick="saveSheetsConfig()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold">
+            Save Webhook URL
+          </button>
+          <button onclick="syncToSheetsNow()" id="syncNowBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync All Jobs Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let allJobs = [];
+    let currentStatusFilter = 'ALL';
+    let currentTailorData = null;
+
+    async function fetchJobs() {
+      try {
+        const res = await fetch('/api/jobs');
+        const data = await res.json();
+        if (data.success) {
+          allJobs = data.jobs;
+          updateStats(data.stats);
+
+          // Handle scanner status
+          const banner = document.getElementById('scanningBanner');
+          const scanText = document.getElementById('scanStatusText');
+          if (data.isScanning) {
+            banner.classList.remove('hidden');
+            scanText.innerText = data.scanStatusMessage || 'Scanning job boards...';
+          } else {
+            banner.classList.add('hidden');
+          }
+
+          renderJobs();
+        }
+      } catch (err) {
+        console.error('Error fetching jobs:', err);
+      }
+    }
+
+    function updateStats(stats) {
+      document.getElementById('statTotal').innerText = stats.total || 0;
+      document.getElementById('statHighMatch').innerText = stats.highlyRecommended || 0;
+      document.getElementById('statApplied').innerText = stats.applied || 0;
+      document.getElementById('statInterview').innerText = stats.interview || 0;
+    }
+
+    function setStatusFilter(status) {
+      currentStatusFilter = status;
+      ['ALL', 'HIGH', 'NEW', 'APPLIED', 'INTERVIEW'].forEach(tab => {
+        const el = document.getElementById(`tab${tab}`);
+        if (tab === status) {
+          el.className = 'px-3 py-1.5 rounded-lg bg-blue-600 text-white font-semibold transition';
+        } else {
+          el.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+        }
+      });
+      renderJobs();
+    }
+
+    function renderJobs() {
+      const container = document.getElementById('jobsContainer');
+      const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const platform = document.getElementById('platformFilter').value;
+
+      let filtered = allJobs.filter(j => {
+        // Platform filter
+        if (platform !== 'ALL' && j.platform?.toLowerCase() !== platform.toLowerCase()) return false;
+
+        // Status filter
+        if (currentStatusFilter === 'NEW' && j.status && j.status !== 'NEW') return false;
+        if (currentStatusFilter === 'APPLIED' && j.status !== 'APPLIED') return false;
+        if (currentStatusFilter === 'INTERVIEW' && j.status !== 'INTERVIEW') return false;
+        if (currentStatusFilter === 'HIGH' && (j.matchScore || 0) < 80) return false;
+
+        // Search text
+        if (search) {
+          const matchText = `${j.title} ${j.company} ${j.location} ${(j.matchedKeywords || []).join(' ')}`.toLowerCase();
+          if (!matchText.includes(search)) return false;
+        }
+
+        return true;
+      });
+
+      // Sort by match score descending
+      filtered.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="glass-card rounded-2xl p-12 text-center text-slate-500">
+            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+            <p>No jobs matching this filter.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = filtered.map(job => {
+        const score = job.matchScore || 50;
+        let scoreBadge = 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10';
+        if (score < 80 && score >= 65) scoreBadge = 'border-amber-500/40 text-amber-400 bg-amber-500/10';
+        if (score < 65) scoreBadge = 'border-slate-500/40 text-slate-400 bg-slate-500/10';
+
+        const status = job.status || 'NEW';
+
+        const matchedTags = (job.matchedKeywords || []).slice(0, 5).map(k => `
+          <span class="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-300 border border-blue-500/20 text-[11px]">${k}</span>
+        `).join('');
+
+        const missingTags = (job.missingKeywords || []).slice(0, 3).map(k => `
+          <span class="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[11px]">${k}</span>
+        `).join('');
+
+        return `
+          <div class="glass-card p-5 rounded-2xl transition duration-200">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              
+              <!-- Left Details -->
+              <div class="flex items-start space-x-4">
+                <div class="w-14 h-14 rounded-2xl border flex flex-col items-center justify-center font-bold ${scoreBadge} shrink-0">
+                  <span class="text-base">${score}%</span>
+                  <span class="text-[9px] uppercase font-semibold">Match</span>
+                </div>
+
+                <div class="space-y-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h3 class="text-base font-bold text-white hover:text-blue-400 transition cursor-pointer" onclick="window.open('${job.url}', '_blank')">
+                      ${job.title}
+                    </h3>
+                    <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-xs font-medium uppercase tracking-wider">
+                      ${job.platform}
+                    </span>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+                    <span class="font-medium text-slate-200 flex items-center gap-1">
+                      <i data-lucide="building-2" class="w-3.5 h-3.5 text-slate-400"></i> ${job.company}
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i> ${job.location || 'India'}
+                    </span>
+                    <span class="flex items-center gap-1 text-slate-400">
+                      <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${job.postedDate || 'Recent'}
+                    </span>
+                  </div>
+
+                  <!-- Keywords chips -->
+                  <div class="flex flex-wrap items-center gap-1.5 pt-2">
+                    ${matchedTags}
+                    ${missingTags ? `<span class="text-[10px] text-slate-500 ml-1">Missing:</span> ${missingTags}` : ''}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Actions -->
+              <div class="flex flex-wrap items-center gap-2.5 shrink-0 self-end md:self-center">
+                <!-- Status Dropdown -->
+                <select onchange="updateJobStatus('${job.id}', this.value)" 
+                  class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none cursor-pointer ${
+                    status === 'APPLIED' ? 'text-indigo-400 border-indigo-500/50' :
+                    status === 'INTERVIEW' ? 'text-amber-400 border-amber-500/50' : 'text-slate-300'
+                  }">
+                  <option value="NEW" ${status === 'NEW' ? 'selected' : ''}>Status: New</option>
+                  <option value="REVIEWED" ${status === 'REVIEWED' ? 'selected' : ''}>Status: Reviewed</option>
+                  <option value="APPLIED" ${status === 'APPLIED' ? 'selected' : ''}>Status: Applied ✅</option>
+                  <option value="INTERVIEW" ${status === 'INTERVIEW' ? 'selected' : ''}>Status: Interview 🎉</option>
+                  <option value="REJECTED" ${status === 'REJECTED' ? 'selected' : ''}>Status: Rejected</option>
+                </select>
+
+                <!-- Tailor Resume Button -->
+                <button onclick="openResumeCustomizer('${job.id}')" 
+                  class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium flex items-center gap-1.5 transition">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-400"></i>
+                  <span>Tailor Resume</span>
+                </button>
+
+                <!-- Autofill & Apply Button -->
+                <button onclick="launchAutofill('${job.url}')" 
+                  class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-blue-600/20 transition">
+                  <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                  <span>Autofill & Apply</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    async function updateJobStatus(jobId, newStatus) {
+      try {
+        await fetch(`/api/jobs/${jobId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const job = allJobs.find(j => j.id === jobId);
+        if (job) job.status = newStatus;
+        renderJobs();
+      } catch (e) {
+        console.error('Error updating status:', e);
+      }
+    }
+
+    async function launchAutofill(jobUrl) {
+      if (!confirm('Launch interactive Google Chrome window with Form Autofill Assistant?')) return;
+      try {
+        await fetch('/api/autofill', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: jobUrl })
+        });
+        alert('Chrome window launched! Review the filled fields and click Submit yourself.');
+      } catch (e) {
+        alert('Autofill launch notice: ' + e.message);
+      }
+    }
+
+    // RESUME CUSTOMIZER MODAL
+    async function openResumeCustomizer(jobId) {
+      const job = allJobs.find(j => j.id === jobId);
+      if (!job) return;
+
+      const modal = document.getElementById('resumeModal');
+      const info = document.getElementById('resumeModalJobInfo');
+      const loading = document.getElementById('resumeModalLoading');
+      const content = document.getElementById('resumeModalContent');
+
+      info.innerText = `${job.title} at ${job.company}`;
+      modal.classList.remove('hidden');
+      loading.classList.remove('hidden');
+      content.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/resume/tailor', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: job.title,
+            company: job.company,
+            description: job.description || `${job.title} at ${job.company}. Core skills: AWS, EKS, Terraform, Kubernetes, SRE.`
+          })
+        });
+        const data = await res.json();
+        if (data.success && data.tailored) {
+          currentTailorData = data.tailored;
+          renderTailorResult(data.tailored);
+          loading.classList.add('hidden');
+          content.classList.remove('hidden');
+        } else {
+          alert('Could not tailor resume: ' + (data.error || 'Unknown error'));
+          closeResumeModal();
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+        closeResumeModal();
+      }
+    }
+
+    function renderTailorResult(tailored) {
+      document.getElementById('tailorMatchedKeywords').innerHTML =
+        (tailored.matchedKeywords || []).map(k => `<span class="bg-emerald-900/50 px-2 py-0.5 rounded border border-emerald-700/50">${k}</span>`).join('');
+
+      document.getElementById('tailorMissingKeywords').innerHTML =
+        (tailored.missingKeywords || []).map(k => `<span class="bg-amber-900/50 px-2 py-0.5 rounded border border-amber-700/50">${k}</span>`).join('');
+
+      document.getElementById('tailorSummaryText').innerText = tailored.tailoredSummary || '';
+
+      document.getElementById('tailorBulletsList').innerHTML =
+        (tailored.tailoredExperienceBullets || []).map(b => `<li class="mb-1">${b}</li>`).join('');
+
+      document.getElementById('tailorPitchText').innerText = tailored.coverLetterPitch || '';
+      lucide.createIcons();
+    }
+
+    function copyCoverLetter() {
+      if (currentTailorData?.coverLetterPitch) {
+        navigator.clipboard.writeText(currentTailorData.coverLetterPitch);
+        alert('Cover letter pitch copied to clipboard!');
+      }
+    }
+
+    function closeResumeModal() {
+      document.getElementById('resumeModal').classList.add('hidden');
+    }
+
+    // SCAN MODAL
+    function openScanModal() { document.getElementById('scanModal').classList.remove('hidden'); }
+    function closeScanModal() { document.getElementById('scanModal').classList.add('hidden'); }
+
+    async function triggerScan() {
+      const role = document.getElementById('scanRoleInput').value;
+      const location = document.getElementById('scanLocationInput').value;
+      const timeFilter = document.getElementById('scanTimeFilter').value;
+      const enableAI = document.getElementById('scanEnableAI').checked;
+
+      const platforms = [];
+      if (document.getElementById('plat_linkedin').checked) platforms.push('linkedin');
+      if (document.getElementById('plat_naukri').checked) platforms.push('naukri');
+      if (document.getElementById('plat_indeed').checked) platforms.push('indeed');
+      if (document.getElementById('plat_wellfound').checked) platforms.push('wellfound');
+      if (document.getElementById('plat_instahyre').checked) platforms.push('instahyre');
+
+      closeScanModal();
+
+      await fetch('/api/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role, location, timeFilter, platforms, enableAI })
+      });
+
+      // Poll updates
+      setTimeout(fetchJobs, 2000);
+      const poll = setInterval(async () => {
+        await fetchJobs();
+        const banner = document.getElementById('scanningBanner');
+        if (banner.classList.contains('hidden')) {
+          clearInterval(poll);
+        }
+      }, 4000);
+    }
+
+    // SHEETS MODAL
+    function openSheetsModal() { document.getElementById('sheetsModal').classList.remove('hidden'); }
+    function closeSheetsModal() { document.getElementById('sheetsModal').classList.add('hidden'); }
+
+    async function checkSheetsStatus() {
+      try {
+        const res = await fetch('/api/sheets/status');
+        const data = await res.json();
+        const dot = document.getElementById('sheetsStatusDot');
+        if (data.configured) {
+          dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+          if (data.webhookUrl && !document.getElementById('sheetsWebhookInput').value) {
+            document.getElementById('sheetsWebhookInput').value = data.webhookUrl === 'Configured' ? 'Connected via .env' : data.webhookUrl;
+          }
+        } else {
+          dot.className = 'w-2 h-2 rounded-full bg-slate-500';
+        }
+      } catch (e) {}
+    }
+
+    async function saveSheetsConfig() {
+      const webhookUrl = document.getElementById('sheetsWebhookInput').value.trim();
+      if (!webhookUrl) return alert('Please enter a Webhook URL');
+      await fetch('/api/sheets/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhookUrl })
+      });
+      alert('Saved! You can now sync to your Google Sheet.');
+      checkSheetsStatus();
+    }
+
+    async function syncToSheetsNow() {
+      const btn = document.getElementById('syncNowBtn');
+      btn.innerText = 'Syncing...';
+      try {
+        const res = await fetch('/api/sheets/sync', { method: 'POST' });
+        const data = await res.json();
+        alert(data.message);
+      } catch (e) {
+        alert('Sync error: ' + e.message);
+      } finally {
+        btn.innerHTML = '<i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync All Jobs Now';
+        lucide.createIcons();
+      }
+    }
+
+    // Initial load
+    fetchJobs();
+    checkSheetsStatus();
+    setInterval(fetchJobs, 15000); // Live poll every 15s
+  </script>
+</body>
+</html>
+

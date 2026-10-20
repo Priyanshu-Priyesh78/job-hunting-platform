@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+*.log
+session_cookies/
+user_data/
+resumes/*.pdf
+!resumes/.gitkeep
