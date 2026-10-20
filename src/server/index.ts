@@ -238,7 +238,20 @@ app.get('/api/networking/leads', async (req, res) => {
   }
 });
 
-// 9. SMART AUTOFILL LAUNCH
+// 9. SMART AUTOFILL LAUNCH & BOOKMARKLET
+app.get('/api/autofill/bookmarklet', (req, res) => {
+  try {
+    const filePath = path.resolve(process.cwd(), 'dist/bookmarklet_raw.js');
+    if (fs.existsSync(filePath)) {
+      const code = fs.readFileSync(filePath, 'utf8');
+      return res.json({ success: true, code });
+    }
+    res.json({ success: false, message: 'Bookmarklet not found' });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.post('/api/autofill', async (req, res) => {
   const { url, resumePath } = req.body;
   if (!url) {
