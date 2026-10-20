@@ -31,6 +31,7 @@ export class ResumePdfGenerator {
 <head>
   <meta charset="utf-8">
   <title>Priyanshu Priyesh - Resume</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { box-sizing: border-box; }
     body {

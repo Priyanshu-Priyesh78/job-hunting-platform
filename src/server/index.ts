@@ -229,8 +229,9 @@ app.get('/api/networking/leads', async (req, res) => {
   try {
     const company = (req.query.company as string) || 'Company';
     const jobTitle = (req.query.title as string) || 'DevOps Engineer';
+    const jobId = (req.query.jobId as string) || '';
 
-    const leadInfo = await networkFinder.getLeadsAndPitch(company, jobTitle);
+    const leadInfo = await networkFinder.getLeadsAndPitch(company, jobTitle, jobId);
     res.json({ success: true, leadInfo });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });

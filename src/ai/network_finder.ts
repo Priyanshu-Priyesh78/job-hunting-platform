@@ -53,37 +53,36 @@ export class NetworkFinder {
     return clean ? `${clean}.com` : 'company.com';
   }
 
-  private humanizeAndTrim(text: string, brandName: string): string {
+  private humanizeAndTrim(text: string, brandName: string, jobRef: string): string {
     let cleaned = text
       .replace(/^(Subject|Note|Message|Draft|Connection Request):?/i, '')
       .replace(/^(Dear|Hello there|Hope this finds you well|I am thrilled to reach out|Greetings),?/gi, 'Hi [Name],')
-      .replace(/\b(delve|testament|esteemed|plethora|thrilled|spearheading|harnessing)\b/gi, '')
+      .replace(/\b(delve|testament|esteemed|plethora|thrilled|spearheading|harnessing|tapestry|paramount)\b/gi, '')
       .replace(/\s+/g, ' ')
       .trim();
 
-    // Ensure under 200-220 characters
-    if (cleaned.length > 220) {
-      // Split by sentences and keep first sentences that fit
+    // Ensure under 230 characters
+    if (cleaned.length > 240) {
       const sentences = cleaned.split(/(?<=[.!?])\s+/);
       let acc = '';
       for (const s of sentences) {
-        if ((acc + ' ' + s).trim().length <= 210) {
+        if ((acc + ' ' + s).trim().length <= 230) {
           acc = (acc + ' ' + s).trim();
         } else {
           break;
         }
       }
-      cleaned = acc || cleaned.slice(0, 195) + '...';
+      cleaned = acc || cleaned.slice(0, 220) + '...';
     }
 
     if (!cleaned || cleaned.length < 30) {
-      cleaned = `Hi [Name], fellow LNCT grad here! Love what you're doing at ${brandName}. I manage 14+ production EKS clusters at Revent Labs—would love to connect with fellow SREs here!`;
+      cleaned = `Hi [Name], saw the ${jobRef} opening at ${brandName}. I manage 14+ production EKS clusters at Revent Labs & would love to connect for a potential referral!`;
     }
 
     return cleaned;
   }
 
-  async getLeadsAndPitch(company: string, jobTitle: string): Promise<NetworkingLeadInfo> {
+  async getLeadsAndPitch(company: string, jobTitle: string, targetJobId?: string): Promise<NetworkingLeadInfo> {
     const { brandName, searchTerms } = this.cleanCompany(company);
     const domain = this.cleanDomain(brandName);
     const hunterKey = process.env.HUNTER_API_KEY;
@@ -109,6 +108,22 @@ export class NetworkFinder {
         // Hunter.io notice
       }
     }
+
+    // Extract clean numeric/alphanumeric Job ID if provided
+    let displayJobId = '';
+    if (targetJobId) {
+      const numMatch = targetJobId.match(/\d{5,}/);
+      if (numMatch) {
+        displayJobId = numMatch[0];
+      } else {
+        const clean = targetJobId.replace(/^(li_|in_|ind_)/, '').trim();
+        if (clean && clean.length <= 15) {
+          displayJobId = clean;
+        }
+      }
+    }
+
+    const jobRef = displayJobId ? `${jobTitle} (Job ID: ${displayJobId})` : `${jobTitle}`;
 
     // 1. Strict boolean LinkedIn search queries
     const linkedinSearches = {
@@ -138,30 +153,25 @@ export class NetworkFinder {
 
     const prompt = `You are a real human software engineer writing a warm, casual LinkedIn connection request note for Priyanshu Priyesh to someone at ${brandName}.
 
-CRITICAL CONSTRAINT:
-- TOTAL LENGTH MUST BE STRICTLY UNDER 200 CHARACTERS (MAX 210 CHARACTERS). LinkedIn connection request limit is 300 characters.
-- HUMAN TONE ONLY: No robotic AI cliches ("I hope this finds you well", "thrilled", "esteemed", "delve").
-- Write 2 casual, authentic human sentences.
+CRITICAL REQUIREMENTS:
+- TOTAL LENGTH: MUST BE UNDER 230 CHARACTERS (LinkedIn note limit is 300 characters).
+- MUST SPECIFICALLY MENTION:
+  1. The opening: "${jobRef}" at ${brandName}
+  2. Purpose: Reaching out to connect regarding this role for a potential referral or quick chat
+  3. Credibility: SRE at Revent Labs managing 14+ production EKS clusters
+- TONE: Natural, human, respectful, zero AI fluff (no "thrilled", "esteemed", "delve", "hope this finds you well").
 
-Priyanshu's Profile:
-- SRE at Revent Labs (runs 14+ production EKS clusters, zero downtime).
-- LNCT Bhopal 2025 B.Tech grad.
-- Target Company: ${brandName}.
+Example Note:
+"Hi [Name], saw the ${jobRef} opening at ${brandName}. I manage 14+ production EKS clusters at Revent Labs and would love to connect to discuss a potential referral!"
 
-Example 1 (for alumni):
-"Hi [Name], fellow LNCT 2025 grad here! Love what you're building at ${brandName}. I run 14+ EKS clusters at Revent Labs—would love to connect & say hi!"
-
-Example 2 (for lead/recruiter):
-"Hi [Name], saw your DevOps work at ${brandName}. I manage 14+ production EKS clusters at Revent Labs and would love to connect with fellow SREs here!"
-
-Output ONLY the final 1-2 sentence connection note. Do not exceed 200 characters.`;
+Provide ONLY the exact text of the 1-2 sentence connection note.`;
 
     let networkingNote = '';
     try {
       networkingNote = await (this.ai as any).callWithFallback(prompt, false);
-      networkingNote = this.humanizeAndTrim(networkingNote, brandName);
+      networkingNote = this.humanizeAndTrim(networkingNote, brandName, jobRef);
     } catch {
-      networkingNote = `Hi [Name], fellow LNCT 2025 grad here! Love what you're building at ${brandName}. I run 14+ EKS clusters at Revent Labs—would love to connect with fellow SREs!`;
+      networkingNote = `Hi [Name], saw the ${jobRef} opening at ${brandName}. I manage 14+ production EKS clusters at Revent Labs & would love to connect for a potential referral!`;
     }
 
     return {

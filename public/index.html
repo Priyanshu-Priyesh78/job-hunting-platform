@@ -397,7 +397,66 @@
         <!-- Visual In-Place Paper Document (Editable Template) -->
         <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex justify-center">
           <div id="visualResumeDoc" contenteditable="true" spellcheck="false" class="bg-white text-slate-900 p-8 rounded-lg shadow-2xl border border-slate-300 w-full max-w-[800px] min-h-[900px] outline-none font-sans text-xs select-text leading-relaxed">
-            <!-- Loaded dynamically with Priyanshu's pristine template -->
+            <div class="text-center pb-2 mb-3 border-b-2 border-slate-900">
+              <h1 class="text-xl font-extrabold uppercase tracking-wide text-slate-900">PRIYANSHU PRIYESH</h1>
+              <div class="text-xs font-semibold text-slate-700 mt-0.5">Software Engineer / SRE — AWS — Kubernetes — Terraform — Platform Engineering</div>
+              <div class="text-[11px] text-slate-600 mt-1">8809003179 &nbsp;•&nbsp; priyanshupriyesh78@gmail.com &nbsp;•&nbsp; linkedin.com/in/priyanshu-priyesh-187340233</div>
+            </div>
+
+            <div class="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5 mb-1 text-slate-900">SUMMARY</div>
+            <p class="text-[11px] leading-relaxed text-slate-800 text-justify mb-3">
+              Software Engineer / SRE with experience operating production-grade, globally distributed AWS and Kubernetes platforms supporting a large-scale CPaaS environment. Hands-on with Amazon EKS, Terraform/Terragrunt, Helm, ArgoCD/GitOps, Gloo Gateway, AWS networking and security, observability, autoscaling, incident response, and infrastructure reliability. Experienced in operating 14+ production EKS clusters across 7 AWS regions and 280+ nodes, leading platform upgrades and security initiatives, operating Kubernetes-based API gateway infrastructure, standardizing multi-account infrastructure, and improving reliability, operational efficiency, and cloud resource utilization.
+            </p>
+
+            <div class="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5 mb-1 text-slate-900">TECHNICAL SKILLS</div>
+            <div class="space-y-1 mb-3 text-[11px] leading-relaxed text-slate-800">
+              <div><strong class="text-slate-900">Cloud & AWS:</strong> <span id="skill-cloud-text">AWS, Amazon EKS, EC2, VPC, ALB, WAF, Global Accelerator, Shield Advanced, Route 53, CloudFront, API Gateway, Lambda, S3, Kinesis, Athena, Secrets Manager, SSM, CloudWatch, ACM</span></div>
+              <div><strong class="text-slate-900">Kubernetes & Containers:</strong> <span id="skill-k8s-text">Kubernetes, Amazon EKS, Docker, Helm, Gloo Gateway, Kubernetes RBAC, HPA, CSI Drivers, Load Balancer Controllers, RateLimit, ExtAuth, Autoscaling, Cluster Upgrades</span></div>
+              <div><strong class="text-slate-900">Infrastructure as Code:</strong> <span id="skill-iac-text">Terraform, Terragrunt, Atlantis, reusable Terraform modules, multi-account and multi-environment infrastructure</span></div>
+              <div><strong class="text-slate-900">CI/CD & GitOps:</strong> <span id="skill-cicd-text">ArgoCD, GitHub Actions, Atlantis, Jsonnet, GitOps, automated infrastructure and application delivery</span></div>
+              <div><strong class="text-slate-900">Observability & SRE:</strong> <span id="skill-obs-text">Prometheus, VictoriaMetrics, Grafana, Alertmanager, Fluent Bit, OpenSearch, Kibana, CloudWatch, Metrics, Logging, Alerting, Incident Response, RCA, Runbooks, Reliability Engineering</span></div>
+              <div><strong class="text-slate-900">Security & Operations:</strong> <span id="skill-sec-text">IAM, WAF, Shield Advanced, Secrets Management, TLS/Certificates, CVE Remediation, Security Compliance, Jira, Opsgenie, Okta, Confluence</span></div>
+              <div><strong class="text-slate-900">Programming & Systems:</strong> <span id="skill-prog-text">C++, Bash, Linux, Git, GitHub</span></div>
+            </div>
+
+            <div class="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5 mb-1 text-slate-900">PROFESSIONAL EXPERIENCE</div>
+            <div class="mb-3">
+              <div class="flex justify-between items-baseline text-xs">
+                <div><strong class="text-slate-900">Revent Labs</strong> <span class="text-slate-600">— Indore, India</span></div>
+                <div class="text-slate-600 text-[11px]">January 2025 – Present</div>
+              </div>
+              <div class="text-[11.5px] font-semibold text-slate-800 mb-1.5">Software Engineer I</div>
+              <ul class="list-disc list-outside pl-4 space-y-1 text-[11px] leading-relaxed text-slate-800">
+                <li>Owned 14+ production EKS clusters spanning 7 AWS regions and 280+ nodes supporting a globally distributed CPaaS platform, leading quarterly platform upgrades across EKS versions, node AMIs, CSI drivers, load balancer controllers, autoscaling, certificate management, and secrets management while maintaining zero customer-facing downtime.</li>
+                <li>Worked as part of the Gateway Engineering team responsible for operating the Kubernetes-based API gateway layer, managing production Gloo Gateway Proxy, RateLimit, and ExtAuth pods across multi-region EKS clusters and troubleshooting gateway traffic, authentication, authorization, rate limiting, and upstream connectivity issues.</li>
+                <li>Led production incident investigation and RCA across Kubernetes, gateway, networking, authentication, logging, and deployment systems, tracing failures across infrastructure and application layers, driving root-cause remediation, and improving platform reliability and operational resilience.</li>
+                <li>Managed multi-region AWS networking and security infrastructure across 7 regions, including AWS WAF, Global Accelerator, ALB, Route 53, and Shield Advanced; built centralized S3/Athena log analytics for WAF, ALB, and Global Accelerator traffic across Development, QA, and Production environments.</li>
+                <li>Managed and standardized Terraform/Terragrunt infrastructure across 13+ projects, multiple AWS accounts, and environments, migrating teams toward reusable infrastructure modules, eliminating IaC anti-patterns, and reducing configuration drift through Atlantis-based CI/CD workflows.</li>
+                <li>Drove security and compliance initiatives including vendor CVE remediation, mandatory production security rollouts, and regulatory audit logging across 21 GitOps instances, coordinating infrastructure changes while maintaining production availability.</li>
+                <li>Delivered Kubernetes cost attribution across environments by integrating clusters with the organization’s FinOps platform using custom Helm automation and Terraform-based regional configuration; improved resource efficiency through utilization-driven rightsizing and migration to better-suited AWS node types.</li>
+                <li>Standardized operational practices through production runbooks, investigation queries, and internal engineering training, enabling more consistent troubleshooting and faster incident response across the wider engineering team.</li>
+              </ul>
+
+              <div class="text-[11px] font-bold text-slate-800 mt-2 mb-1">Observability & Monitoring</div>
+              <ul class="list-disc list-outside pl-4 space-y-1 text-[11px] leading-relaxed text-slate-800">
+                <li>Owned the platform observability ecosystem across Kubernetes, applications, and AWS infrastructure, covering metrics, logging, alerting, dashboards, and operational visibility.</li>
+                <li>Designed and maintained the metrics and alerting platform using Prometheus-style scraping, VictoriaMetrics, Grafana, and Alertmanager, integrated with Slack and OpsGenie; established 15+ production P1–P3 alerts covering authentication, Kubernetes health, API Gateway traffic, load balancers, and autoscaling systems.</li>
+                <li>Maintained centralized logging using Fluent Bit, S3, OpenSearch, and Kibana, providing end-to-end visibility across application, Kubernetes, and AWS infrastructure layers.</li>
+                <li>Developed 7+ Grafana dashboards and CloudWatch-integrated views for Kubernetes, ALB, WAF, Global Accelerator, authentication, and platform health, mapping operational alerts directly to dashboards for faster incident triage.</li>
+                <li>Reduced alert fatigue through threshold tuning, alert inhibition, grouping, and routing improvements while maintaining actionable coverage of critical production services.</li>
+                <li>Delivered internal observability training and maintained runbooks covering alert investigation, remediation workflows, and operational troubleshooting.</li>
+              </ul>
+            </div>
+
+            <div class="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5 mb-1 text-slate-900">EDUCATION</div>
+            <div class="flex justify-between items-baseline text-xs text-slate-800">
+              <div><strong class="text-slate-900">Lakshmi Narain College of Technology (LNCT)</strong> — Bhopal, India</div>
+              <div class="text-[11px] text-slate-600">Graduated: 2025</div>
+            </div>
+            <div class="flex justify-between items-baseline text-[11px] text-slate-700">
+              <span>Bachelor of Technology – Computer Science Engineering</span>
+              <span>CGPA: <strong>8.45/10</strong></span>
+            </div>
           </div>
         </div>
 
@@ -467,11 +526,11 @@
           </div>
         </div>
 
-        <!-- Humanized LinkedIn Connection Note (Strictly under 200 Characters) -->
+        <!-- Humanized LinkedIn Connection Note (Role, Job ID & Referral Purpose) -->
         <div class="space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <i data-lucide="message-square" class="w-4 h-4 text-blue-400"></i> Humanized LinkedIn Connection Note (Under 200 Characters)
+              <i data-lucide="message-square" class="w-4 h-4 text-blue-400"></i> Humanized LinkedIn Referral Note (Role, Job ID & Purpose)
             </span>
             <button onclick="copyNetworkingNote()" class="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1">
               <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Note
@@ -479,8 +538,8 @@
           </div>
           <textarea id="leadNetworkingNote" oninput="updateNoteCharCount()" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-sans"></textarea>
           <div class="flex justify-between items-center text-[11px]">
-            <span id="noteCharCount" class="font-mono text-emerald-400">0 / 200 characters</span>
-            <span class="text-slate-500">Optimized for LinkedIn 300-char connection limit</span>
+            <span id="noteCharCount" class="font-mono text-emerald-400">0 / 230 characters</span>
+            <span class="text-slate-500">Mentions Role, Job ID & Purpose • Fits LinkedIn 300-char limit</span>
           </div>
         </div>
 
@@ -883,14 +942,41 @@
 
       info.innerText = `${job.title} at ${job.company}`;
       modal.classList.remove('hidden');
-      loading.classList.remove('hidden');
-      editorTab.classList.add('hidden');
+      loading.classList.add('hidden');
+      editorTab.classList.remove('hidden');
       btnDownload.classList.add('hidden');
+
+      // 1. Immediately preload user resume if empty
+      const doc = document.getElementById('visualResumeDoc');
+      if (!doc.innerHTML || doc.innerHTML.trim().length < 100) {
+        doc.innerHTML = BASE_RESUME_HTML;
+      }
 
       document.getElementById('generatedPdfNameLabel').innerText = 
         `Will save as: PRIYANSHU_PRIYESH_${job.company.toUpperCase().replace(/[^A-Z0-9]/g, '_')}.pdf`;
 
       switchResumeTab('editor');
+
+      // 2. Set analyzing status on the Missing Keywords bar (NOT blocking the document)
+      const missingContainer = document.getElementById('clickableMissingPills');
+      missingContainer.innerHTML = `
+        <div class="flex items-center gap-2 text-xs text-blue-400 py-1">
+          <div class="w-3.5 h-3.5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+          Scanning JD for missing ATS keywords...
+        </div>
+      `;
+
+      // 3. Extract clean Job ID if present
+      let extractedJobId = '';
+      if (job.id) {
+        const m = job.id.match(/\d{5,}/);
+        if (m) extractedJobId = m[0];
+        else extractedJobId = job.id.replace(/^(li_|in_|ind_)/, '');
+      }
+      if (!extractedJobId && job.url) {
+        const m = job.url.match(/\d{6,}/);
+        if (m) extractedJobId = m[0];
+      }
 
       try {
         // Run parallel: Resume tailoring + Networking lead fetch
@@ -904,18 +990,17 @@
               description: job.description || `${job.title} at ${job.company}. Core skills: AWS, EKS, Terraform, Kubernetes, SRE.`
             })
           }),
-          fetch(`/api/networking/leads?company=${encodeURIComponent(job.company)}&title=${encodeURIComponent(job.title)}`)
+          fetch(`/api/networking/leads?company=${encodeURIComponent(job.company)}&title=${encodeURIComponent(job.title)}&jobId=${encodeURIComponent(extractedJobId)}`)
         ]);
 
         const tailorData = await tailorRes.json();
         const networkData = await networkRes.json();
 
-        loading.classList.add('hidden');
-        editorTab.classList.remove('hidden');
-
         if (tailorData.success && tailorData.tailored) {
           currentTailorData = tailorData.tailored;
           populateResumeEditor(tailorData.tailored, job);
+        } else {
+          missingContainer.innerHTML = '<span class="text-xs text-slate-400">Analysis ready. Click anywhere in your resume below to edit or type.</span>';
         }
 
         if (networkData.success && networkData.leadInfo) {
@@ -924,8 +1009,8 @@
         }
 
       } catch (err) {
-        alert('Notice: ' + err.message);
-        closeResumeModal();
+        console.warn('Analysis notice:', err.message);
+        missingContainer.innerHTML = '<span class="text-xs text-slate-400">Click anywhere in your resume below to edit or type.</span>';
       }
     }
 
@@ -1046,8 +1131,8 @@
       const counterEl = document.getElementById('noteCharCount');
       if (!noteEl || !counterEl) return;
       const len = noteEl.value.length;
-      counterEl.innerText = `${len} / 200 characters`;
-      if (len > 200) {
+      counterEl.innerText = `${len} / 230 characters`;
+      if (len > 230) {
         counterEl.className = 'font-mono text-rose-400 font-bold';
       } else {
         counterEl.className = 'font-mono text-emerald-400';
