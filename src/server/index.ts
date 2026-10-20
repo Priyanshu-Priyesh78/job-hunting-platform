@@ -11,6 +11,8 @@ import { ScraperManager } from '../scrapers/index.js';
 import { GeminiAI } from '../ai/gemini.js';
 import { FormAutofiller } from '../autofill/browser_autofill.js';
 import { ResumeTailorer } from '../ai/resume_tailorer.js';
+import { ResumePdfGenerator, ResumeData } from '../ai/pdf_generator.js';
+import { NetworkFinder } from '../ai/network_finder.js';
 import { CandidateProfile, SearchConfig } from '../types/index.js';
 
 const app = express();
@@ -32,11 +34,24 @@ const sheetsSync = new GoogleSheetsSync();
 const scraperManager = new ScraperManager(searchConfig, profile, ai);
 const autofiller = new FormAutofiller(profile, searchConfig, ai);
 const resumeTailorer = new ResumeTailorer(profile, ai);
+const pdfGenerator = new ResumePdfGenerator(searchConfig);
+const networkFinder = new NetworkFinder(profile, ai);
 
-let isScanning = false;
-let scanStatusMessage = 'Idle';
+export interface ScanProgress {
+  isScanning: boolean;
+  percent: number;
+  stage: string;
+  detail: string;
+}
 
-// 1. GET ALL JOBS & STATS
+let scanProgress: ScanProgress = {
+  isScanning: false,
+  percent: 0,
+  stage: 'Idle',
+  detail: 'Ready to scan'
+};
+
+// 1. GET ALL JOBS, STATS & SCAN PROGRESS
 app.get('/api/jobs', async (req, res) => {
   try {
     const jobs = await store.getAllJobs();
@@ -46,18 +61,84 @@ app.get('/api/jobs', async (req, res) => {
       reviewed: jobs.filter((j) => j.status === 'REVIEWED').length,
       applied: jobs.filter((j) => j.status === 'APPLIED').length,
       interview: jobs.filter((j) => j.status === 'INTERVIEW').length,
+      rejected: jobs.filter((j) => j.status === 'REJECTED' || j.status === 'NOT_INTERESTED').length,
       highlyRecommended: jobs.filter(
         (j) => j.recommendation === 'HIGHLY_RECOMMENDED' || (j.matchScore || 0) >= 80
       ).length
     };
 
-    res.json({ success: true, jobs, stats, isScanning, scanStatusMessage });
+    res.json({ success: true, jobs, stats, scanProgress });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// 2. UPDATE JOB STATUS
+// 2. SCAN PROGRESS ENDPOINT
+app.get('/api/scan/progress', (req, res) => {
+  res.json({ success: true, scanProgress });
+});
+
+// 3. TRIGGER SCAN (With Live Timeline Progress)
+app.post('/api/scan', async (req, res) => {
+  if (scanProgress.isScanning) {
+    return res.status(409).json({ success: false, message: 'Scan already in progress' });
+  }
+
+  const { platforms, role, location, timeFilter, enableAI } = req.body;
+
+  scanProgress = {
+    isScanning: true,
+    percent: 15,
+    stage: 'Initializing Scanners',
+    detail: `Preparing query for ${role || 'DevOps Engineer'} (${timeFilter || 'week'})...`
+  };
+
+  (async () => {
+    try {
+      scanProgress.percent = 30;
+      scanProgress.stage = 'Scraping Portals';
+      scanProgress.detail = `Scanning ${platforms ? platforms.join(', ') : 'all platforms'}...`;
+
+      const jobs = await scraperManager.runScan({
+        platforms,
+        role: role || searchConfig.targetRoles[0],
+        location: location || 'India',
+        timeFilter: timeFilter || 'week',
+        enableAIAnalysis: enableAI ?? true
+      });
+
+      scanProgress.percent = 75;
+      scanProgress.stage = 'Filtering & Deduplication';
+      scanProgress.detail = `Processing ${jobs.length} candidate jobs and matching keywords...`;
+
+      await store.saveJobs(jobs);
+
+      if (sheetsSync.isConfigured()) {
+        scanProgress.percent = 90;
+        scanProgress.stage = 'Google Sheets Sync';
+        scanProgress.detail = 'Mirroring rows to your Google Spreadsheet...';
+        await sheetsSync.syncJobsToSheet(await store.getAllJobs());
+      }
+
+      scanProgress.percent = 100;
+      scanProgress.stage = 'Completed';
+      scanProgress.detail = `Scan finished! Saved ${jobs.length} jobs.`;
+    } catch (err: any) {
+      scanProgress.stage = 'Error';
+      scanProgress.detail = `Error: ${err.message}`;
+    } finally {
+      setTimeout(() => {
+        scanProgress.isScanning = false;
+        scanProgress.stage = 'Idle';
+        scanProgress.percent = 0;
+      }, 7000);
+    }
+  })();
+
+  res.json({ success: true, message: 'Scan started in background' });
+});
+
+// 4. UPDATE JOB STATUS
 app.patch('/api/jobs/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
@@ -68,7 +149,6 @@ app.patch('/api/jobs/:id/status', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Job not found' });
     }
 
-    // Auto sync to sheet if configured
     if (sheetsSync.isConfigured()) {
       sheetsSync.syncJobsToSheet(await store.getAllJobs()).catch(() => {});
     }
@@ -79,70 +159,7 @@ app.patch('/api/jobs/:id/status', async (req, res) => {
   }
 });
 
-// 3. TRIGGER SCAN
-app.post('/api/scan', async (req, res) => {
-  if (isScanning) {
-    return res.status(409).json({ success: false, message: 'Scan already in progress' });
-  }
-
-  const { platforms, role, location, timeFilter, enableAI } = req.body;
-
-  isScanning = true;
-  scanStatusMessage = 'Starting job boards scanner...';
-
-  // Run asynchronously so response is instant
-  (async () => {
-    try {
-      scanStatusMessage = `Scanning ${platforms ? platforms.join(', ') : 'all platforms'} (${timeFilter || 'week'})...`;
-      const jobs = await scraperManager.runScan({
-        platforms,
-        role: role || searchConfig.targetRoles[0],
-        location: location || 'India',
-        timeFilter: timeFilter || 'week',
-        enableAIAnalysis: enableAI ?? true
-      });
-
-      scanStatusMessage = `Saving ${jobs.length} jobs to storage...`;
-      await store.saveJobs(jobs);
-
-      if (sheetsSync.isConfigured()) {
-        scanStatusMessage = 'Syncing to Google Sheets...';
-        await sheetsSync.syncJobsToSheet(await store.getAllJobs());
-      }
-
-      scanStatusMessage = `Completed! Scanned ${jobs.length} jobs.`;
-    } catch (err: any) {
-      scanStatusMessage = `Scan error: ${err.message}`;
-    } finally {
-      isScanning = false;
-      setTimeout(() => {
-        scanStatusMessage = 'Idle';
-      }, 10000);
-    }
-  })();
-
-  res.json({ success: true, message: 'Scan started in background' });
-});
-
-// 4. SMART AUTOFILL LAUNCH
-app.post('/api/autofill', async (req, res) => {
-  const { url, resumePath } = req.body;
-  if (!url) {
-    return res.status(400).json({ success: false, message: 'URL required' });
-  }
-
-  // Launch browser session
-  autofiller
-    .launchAutofillSession(url, resumePath)
-    .catch((err) => console.error('Autofill browser error:', err.message));
-
-  res.json({
-    success: true,
-    message: 'Chrome browser launched with Autofill Assistant! Please review and submit on screen.'
-  });
-});
-
-// 5. TAILOR RESUME FOR JOB
+// 5. RESUME TAILORING (Gemini JD Analysis)
 app.post('/api/resume/tailor', async (req, res) => {
   try {
     const { title, company, description } = req.body;
@@ -157,7 +174,79 @@ app.post('/api/resume/tailor', async (req, res) => {
   }
 });
 
-// 6. GOOGLE SHEETS SYNC
+// 6. GENERATE AND SAVE CUSTOMIZED RESUME PDF
+app.post('/api/resume/generate-pdf', async (req, res) => {
+  try {
+    const { company, resumeData, jobId } = req.body;
+    if (!company || !resumeData) {
+      return res.status(400).json({ success: false, message: 'Company and resumeData required' });
+    }
+
+    const { filename, filePath } = await pdfGenerator.generatePdf(company, resumeData);
+
+    // Update job notes and tracking with customized resume name
+    if (jobId) {
+      const note = `Custom Resume: ${filename}`;
+      await store.updateJobStatus(jobId, undefined, note);
+      if (sheetsSync.isConfigured()) {
+        sheetsSync.syncJobsToSheet(await store.getAllJobs()).catch(() => {});
+      }
+    }
+
+    res.json({
+      success: true,
+      filename,
+      filePath,
+      downloadUrl: `/api/resumes/download/${filename}`
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 7. DOWNLOAD GENERATED PDF
+app.get('/api/resumes/download/:filename', (req, res) => {
+  const { filename } = req.params;
+  const filePath = path.join(process.cwd(), 'resumes', path.basename(filename));
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send('Resume PDF not found');
+  }
+
+  res.download(filePath, filename);
+});
+
+// 8. NETWORKING, ALUMNI & EMAIL LEADS
+app.get('/api/networking/leads', async (req, res) => {
+  try {
+    const company = (req.query.company as string) || 'Company';
+    const jobTitle = (req.query.title as string) || 'DevOps Engineer';
+
+    const leadInfo = await networkFinder.getLeadsAndPitch(company, jobTitle);
+    res.json({ success: true, leadInfo });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 9. SMART AUTOFILL LAUNCH
+app.post('/api/autofill', async (req, res) => {
+  const { url, resumePath } = req.body;
+  if (!url) {
+    return res.status(400).json({ success: false, message: 'URL required' });
+  }
+
+  autofiller
+    .launchAutofillSession(url, resumePath)
+    .catch((err) => console.error('Autofill browser error:', err.message));
+
+  res.json({
+    success: true,
+    message: 'Chrome browser launched with Autofill Assistant! Please review and submit on screen.'
+  });
+});
+
+// 10. GOOGLE SHEETS SYNC
 app.get('/api/sheets/status', (req, res) => {
   res.json({
     configured: sheetsSync.isConfigured(),
@@ -210,7 +299,7 @@ app.post('/api/sheets/sync', async (req, res) => {
   }
 });
 
-// 7. GET CANDIDATE PROFILE
+// 11. CANDIDATE PROFILE ENDPOINT
 app.get('/api/profile', (req, res) => {
   res.json({ success: true, profile });
 });
@@ -221,4 +310,3 @@ app.listen(PORT, () => {
   console.log(`👉 Open: http://localhost:${PORT}`);
   console.log(`======================================================\n`);
 });
-
