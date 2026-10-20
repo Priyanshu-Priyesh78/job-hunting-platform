@@ -357,93 +357,48 @@
         <p class="text-sm text-slate-300">Gemini is analyzing the JD, finding missing keywords, and preparing your custom resume...</p>
       </div>
 
-      <!-- TAB 1: RESUME EDITOR -->
-      <div id="resumeTabEditor" class="hidden overflow-y-auto space-y-5 pr-2 flex-1 text-sm">
+      <!-- TAB 1: VISUAL RESUME DOCUMENT EDITOR -->
+      <div id="resumeTabEditor" class="hidden overflow-y-auto space-y-4 pr-1 flex-1 text-sm">
         
-        <!-- Missing Keywords with 1-Click Insert Pills -->
-        <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-2">
+        <!-- Missing ATS Keywords Header -->
+        <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i> Missing ATS Keywords from JD (Click to add to your resume):
+              <i data-lucide="alert-circle" class="w-4 h-4"></i> Missing ATS Keywords from JD:
             </span>
-            <span class="text-[11px] text-slate-500">Click pill to inject directly into Skills</span>
+            <span class="text-[11px] text-slate-400">Click a keyword to copy & type into your resume below</span>
           </div>
-          <div id="clickableMissingPills" class="flex flex-wrap gap-2 pt-1"></div>
+          <div id="clickableMissingPills" class="flex flex-wrap gap-2 pt-0.5"></div>
         </div>
 
-        <!-- Editable Sections -->
-        <div class="space-y-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Tailored Summary</label>
-            <textarea id="editResumeSummary" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-blue-500"></textarea>
+        <!-- Sticky Actions Bar -->
+        <div class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-md border border-slate-700 p-3 rounded-xl flex items-center justify-between shadow-xl">
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="file-text" class="w-4 h-4 text-blue-400"></i>
+              Live Resume Editor
+            </span>
+            <span id="generatedPdfNameLabel" class="text-[11px] text-slate-400 font-mono bg-slate-950 px-2 py-0.5 rounded border border-slate-800">PRIYANSHU_PRIYESH_COMPANY.pdf</span>
           </div>
 
-          <div>
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Technical Skills (Edit / Injected Keywords Appear Here)</label>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div>
-                <span class="text-slate-400 text-[11px]">Cloud & AWS:</span>
-                <input type="text" id="editSkillCloud" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-200 mt-0.5">
-              </div>
-              <div>
-                <span class="text-slate-400 text-[11px]">Kubernetes & Containers:</span>
-                <input type="text" id="editSkillK8s" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-200 mt-0.5">
-              </div>
-              <div>
-                <span class="text-slate-400 text-[11px]">Infrastructure as Code:</span>
-                <input type="text" id="editSkillIaC" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-200 mt-0.5">
-              </div>
-              <div>
-                <span class="text-slate-400 text-[11px]">CI/CD & GitOps:</span>
-                <input type="text" id="editSkillCicd" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-200 mt-0.5">
-              </div>
-              <div>
-                <span class="text-slate-400 text-[11px]">Observability & SRE:</span>
-                <input type="text" id="editSkillObs" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-200 mt-0.5">
-              </div>
-              <div>
-                <span class="text-slate-400 text-[11px]">Programming & Systems:</span>
-                <input type="text" id="editSkillProg" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-200 mt-0.5">
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Revent Labs Experience Bullets (Tailored for this role)</label>
-            <textarea id="editResumeBullets" rows="6" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-mono"></textarea>
-            <span class="text-[11px] text-slate-500">Each line will become a bullet point in the generated PDF.</span>
-          </div>
-        </div>
-
-        <!-- PDF Generate & Download Bar -->
-        <div class="bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border border-blue-800/40 p-4 rounded-xl flex items-center justify-between">
-          <div>
-            <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
-              <i data-lucide="file-check" class="w-4 h-4 text-emerald-400"></i>
-              Export Company-Specific PDF
-            </h4>
-            <p id="generatedPdfNameLabel" class="text-[11px] text-slate-400 mt-0.5">Will save as: PRIYANSHU_PRIYESH_COMPANY.pdf</p>
-          </div>
-
-          <div class="flex items-center space-x-3">
-            <a id="btnDownloadPdf" href="#" target="_blank" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-emerald-600/30">
+          <div class="flex items-center space-x-2">
+            <button onclick="resetBaseResume()" title="Reset back to your default uploaded resume template" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium border border-slate-700 flex items-center gap-1">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+            </button>
+            <button onclick="generateCustomPdf()" id="btnGeneratePdf" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-600/30">
+              <i data-lucide="save" class="w-3.5 h-3.5"></i> Generate & Save PDF
+            </button>
+            <a id="btnDownloadPdf" href="#" target="_blank" class="hidden px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/30">
               <i data-lucide="download" class="w-3.5 h-3.5"></i> Download PDF
             </a>
-            <button onclick="generateCustomPdf()" id="btnGeneratePdf" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-blue-600/30">
-              <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Generate & Save PDF
-            </button>
           </div>
         </div>
 
-        <!-- Cover Letter Note -->
-        <div>
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tailored Cover Letter / Pitch</span>
-            <button onclick="copyCoverLetter()" class="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1">
-              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Pitch
-            </button>
+        <!-- Visual In-Place Paper Document (Editable Template) -->
+        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex justify-center">
+          <div id="visualResumeDoc" contenteditable="true" spellcheck="false" class="bg-white text-slate-900 p-8 rounded-lg shadow-2xl border border-slate-300 w-full max-w-[800px] min-h-[900px] outline-none font-sans text-xs select-text leading-relaxed">
+            <!-- Loaded dynamically with Priyanshu's pristine template -->
           </div>
-          <div id="tailorPitchText" class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl text-xs text-slate-200 whitespace-pre-line"></div>
         </div>
 
       </div>
@@ -512,15 +467,21 @@
           </div>
         </div>
 
-        <!-- 200-Word Cold Outreach Message -->
-        <div>
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Personalized Networking / Referral Note (200 Words)</span>
+        <!-- Humanized LinkedIn Connection Note (Strictly under 200 Characters) -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="message-square" class="w-4 h-4 text-blue-400"></i> Humanized LinkedIn Connection Note (Under 200 Characters)
+            </span>
             <button onclick="copyNetworkingNote()" class="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1">
-              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Message
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Note
             </button>
           </div>
-          <div id="leadNetworkingNote" class="bg-slate-950 border border-slate-800 p-4 rounded-xl text-xs text-slate-200 whitespace-pre-line leading-relaxed"></div>
+          <textarea id="leadNetworkingNote" oninput="updateNoteCharCount()" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-sans"></textarea>
+          <div class="flex justify-between items-center text-[11px]">
+            <span id="noteCharCount" class="font-mono text-emerald-400">0 / 200 characters</span>
+            <span class="text-slate-500">Optimized for LinkedIn 300-char connection limit</span>
+          </div>
         </div>
 
       </div>
@@ -572,6 +533,69 @@
     let candidateBaseProfile = null;
     let currentTailorData = null;
     let currentNetworkingData = null;
+
+    const BASE_RESUME_HTML = `
+      <div class="text-center pb-2 mb-3 border-b-2 border-slate-900">
+        <h1 class="text-xl font-extrabold uppercase tracking-wide text-slate-900">PRIYANSHU PRIYESH</h1>
+        <div class="text-xs font-semibold text-slate-700 mt-0.5">Software Engineer / SRE — AWS — Kubernetes — Terraform — Platform Engineering</div>
+        <div class="text-[11px] text-slate-600 mt-1">8809003179 &nbsp;•&nbsp; priyanshupriyesh78@gmail.com &nbsp;•&nbsp; linkedin.com/in/priyanshu-priyesh-187340233</div>
+      </div>
+
+      <div class="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5 mb-1 text-slate-900">SUMMARY</div>
+      <p class="text-[11px] leading-relaxed text-slate-800 text-justify mb-3">
+        Software Engineer / SRE with experience operating production-grade, globally distributed AWS and Kubernetes platforms supporting a large-scale CPaaS environment. Hands-on with Amazon EKS, Terraform/Terragrunt, Helm, ArgoCD/GitOps, Gloo Gateway, AWS networking and security, observability, autoscaling, incident response, and infrastructure reliability. Experienced in operating 14+ production EKS clusters across 7 AWS regions and 280+ nodes, leading platform upgrades and security initiatives, operating Kubernetes-based API gateway infrastructure, standardizing multi-account infrastructure, and improving reliability, operational efficiency, and cloud resource utilization.
+      </p>
+
+      <div class="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5 mb-1 text-slate-900">TECHNICAL SKILLS</div>
+      <div class="space-y-1 mb-3 text-[11px] leading-relaxed text-slate-800">
+        <div><strong class="text-slate-900">Cloud & AWS:</strong> <span id="skill-cloud-text">AWS, Amazon EKS, EC2, VPC, ALB, WAF, Global Accelerator, Shield Advanced, Route 53, CloudFront, API Gateway, Lambda, S3, Kinesis, Athena, Secrets Manager, SSM, CloudWatch, ACM</span></div>
+        <div><strong class="text-slate-900">Kubernetes & Containers:</strong> <span id="skill-k8s-text">Kubernetes, Amazon EKS, Docker, Helm, Gloo Gateway, Kubernetes RBAC, HPA, CSI Drivers, Load Balancer Controllers, RateLimit, ExtAuth, Autoscaling, Cluster Upgrades</span></div>
+        <div><strong class="text-slate-900">Infrastructure as Code:</strong> <span id="skill-iac-text">Terraform, Terragrunt, Atlantis, reusable Terraform modules, multi-account and multi-environment infrastructure</span></div>
+        <div><strong class="text-slate-900">CI/CD & GitOps:</strong> <span id="skill-cicd-text">ArgoCD, GitHub Actions, Atlantis, Jsonnet, GitOps, automated infrastructure and application delivery</span></div>
+        <div><strong class="text-slate-900">Observability & SRE:</strong> <span id="skill-obs-text">Prometheus, VictoriaMetrics, Grafana, Alertmanager, Fluent Bit, OpenSearch, Kibana, CloudWatch, Metrics, Logging, Alerting, Incident Response, RCA, Runbooks, Reliability Engineering</span></div>
+        <div><strong class="text-slate-900">Security & Operations:</strong> <span id="skill-sec-text">IAM, WAF, Shield Advanced, Secrets Management, TLS/Certificates, CVE Remediation, Security Compliance, Jira, Opsgenie, Okta, Confluence</span></div>
+        <div><strong class="text-slate-900">Programming & Systems:</strong> <span id="skill-prog-text">C++, Bash, Linux, Git, GitHub</span></div>
+      </div>
+
+      <div class="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5 mb-1 text-slate-900">PROFESSIONAL EXPERIENCE</div>
+      <div class="mb-3">
+        <div class="flex justify-between items-baseline text-xs">
+          <div><strong class="text-slate-900">Revent Labs</strong> <span class="text-slate-600">— Indore, India</span></div>
+          <div class="text-slate-600 text-[11px]">January 2025 – Present</div>
+        </div>
+        <div class="text-[11.5px] font-semibold text-slate-800 mb-1.5">Software Engineer I</div>
+        <ul class="list-disc list-outside pl-4 space-y-1 text-[11px] leading-relaxed text-slate-800">
+          <li>Owned 14+ production EKS clusters spanning 7 AWS regions and 280+ nodes supporting a globally distributed CPaaS platform, leading quarterly platform upgrades across EKS versions, node AMIs, CSI drivers, load balancer controllers, autoscaling, certificate management, and secrets management while maintaining zero customer-facing downtime.</li>
+          <li>Worked as part of the Gateway Engineering team responsible for operating the Kubernetes-based API gateway layer, managing production Gloo Gateway Proxy, RateLimit, and ExtAuth pods across multi-region EKS clusters and troubleshooting gateway traffic, authentication, authorization, rate limiting, and upstream connectivity issues.</li>
+          <li>Led production incident investigation and RCA across Kubernetes, gateway, networking, authentication, logging, and deployment systems, tracing failures across infrastructure and application layers, driving root-cause remediation, and improving platform reliability and operational resilience.</li>
+          <li>Managed multi-region AWS networking and security infrastructure across 7 regions, including AWS WAF, Global Accelerator, ALB, Route 53, and Shield Advanced; built centralized S3/Athena log analytics for WAF, ALB, and Global Accelerator traffic across Development, QA, and Production environments.</li>
+          <li>Managed and standardized Terraform/Terragrunt infrastructure across 13+ projects, multiple AWS accounts, and environments, migrating teams toward reusable infrastructure modules, eliminating IaC anti-patterns, and reducing configuration drift through Atlantis-based CI/CD workflows.</li>
+          <li>Drove security and compliance initiatives including vendor CVE remediation, mandatory production security rollouts, and regulatory audit logging across 21 GitOps instances, coordinating infrastructure changes while maintaining production availability.</li>
+          <li>Delivered Kubernetes cost attribution across environments by integrating clusters with the organization’s FinOps platform using custom Helm automation and Terraform-based regional configuration; improved resource efficiency through utilization-driven rightsizing and migration to better-suited AWS node types.</li>
+          <li>Standardized operational practices through production runbooks, investigation queries, and internal engineering training, enabling more consistent troubleshooting and faster incident response across the wider engineering team.</li>
+        </ul>
+
+        <div class="text-[11px] font-bold text-slate-800 mt-2 mb-1">Observability & Monitoring</div>
+        <ul class="list-disc list-outside pl-4 space-y-1 text-[11px] leading-relaxed text-slate-800">
+          <li>Owned the platform observability ecosystem across Kubernetes, applications, and AWS infrastructure, covering metrics, logging, alerting, dashboards, and operational visibility.</li>
+          <li>Designed and maintained the metrics and alerting platform using Prometheus-style scraping, VictoriaMetrics, Grafana, and Alertmanager, integrated with Slack and OpsGenie; established 15+ production P1–P3 alerts covering authentication, Kubernetes health, API Gateway traffic, load balancers, and autoscaling systems.</li>
+          <li>Maintained centralized logging using Fluent Bit, S3, OpenSearch, and Kibana, providing end-to-end visibility across application, Kubernetes, and AWS infrastructure layers.</li>
+          <li>Developed 7+ Grafana dashboards and CloudWatch-integrated views for Kubernetes, ALB, WAF, Global Accelerator, authentication, and platform health, mapping operational alerts directly to dashboards for faster incident triage.</li>
+          <li>Reduced alert fatigue through threshold tuning, alert inhibition, grouping, and routing improvements while maintaining actionable coverage of critical production services.</li>
+          <li>Delivered internal observability training and maintained runbooks covering alert investigation, remediation workflows, and operational troubleshooting.</li>
+        </ul>
+      </div>
+
+      <div class="text-xs font-bold uppercase tracking-wider border-b border-slate-300 pb-0.5 mb-1 text-slate-900">EDUCATION</div>
+      <div class="flex justify-between items-baseline text-xs text-slate-800">
+        <div><strong class="text-slate-900">Lakshmi Narain College of Technology (LNCT)</strong> — Bhopal, India</div>
+        <div class="text-[11px] text-slate-600">Graduated: 2025</div>
+      </div>
+      <div class="flex justify-between items-baseline text-[11px] text-slate-700">
+        <span>Bachelor of Technology – Computer Science Engineering</span>
+        <span>CGPA: <strong>8.45/10</strong></span>
+      </div>
+    `;
 
     // SECTION COLLAPSE / EXPAND TOGGLE
     function toggleSection(secId) {
@@ -920,42 +944,43 @@
         `).join('');
       }
 
-      // 2. Summary
-      document.getElementById('editResumeSummary').value = tailored.tailoredSummary || candidateBaseProfile?.summary || '';
+      // Initialize visual document with pristine template if empty
+      const doc = document.getElementById('visualResumeDoc');
+      if (!doc.innerHTML || doc.innerHTML.trim().length < 50) {
+        doc.innerHTML = BASE_RESUME_HTML;
+      }
 
-      // 3. Technical Skills
-      const s = candidateBaseProfile?.skills || {};
-      document.getElementById('editSkillCloud').value = (s.cloud || []).join(', ');
-      document.getElementById('editSkillK8s').value = (s.kubernetes || []).join(', ');
-      document.getElementById('editSkillIaC').value = (s.iac || []).join(', ');
-      document.getElementById('editSkillCicd').value = (s.cicd || []).join(', ');
-      document.getElementById('editSkillObs').value = (s.observability || []).join(', ');
-      document.getElementById('editSkillProg').value = (s.languages || []).join(', ');
-
-      // 4. Revent Labs bullets
-      const bullets = tailored.tailoredExperienceBullets && tailored.tailoredExperienceBullets.length > 0
-        ? tailored.tailoredExperienceBullets
-        : candidateBaseProfile?.workExperience[0]?.highlights || [];
-
-      document.getElementById('editResumeBullets').value = bullets.join('\n\n');
-
-      // 5. Pitch
-      document.getElementById('tailorPitchText').innerText = tailored.coverLetterPitch || '';
       lucide.createIcons();
     }
 
-    function injectKeyword(kw) {
-      const progInput = document.getElementById('editSkillProg');
-      const k8sInput = document.getElementById('editSkillK8s');
-
-      if (kw.toLowerCase().includes('python') || kw.toLowerCase().includes('go') || kw.toLowerCase().includes('bash')) {
-        progInput.value = `${progInput.value}, ${kw}`;
-        progInput.classList.add('bg-amber-950/40');
-      } else {
-        k8sInput.value = `${k8sInput.value}, ${kw}`;
-        k8sInput.classList.add('bg-amber-950/40');
+    function resetBaseResume() {
+      if (confirm('Reset document back to your original pristine resume template?')) {
+        document.getElementById('visualResumeDoc').innerHTML = BASE_RESUME_HTML;
+        alert('Reset to original resume template!');
       }
-      alert(`Injected "${kw}" into your Technical Skills section!`);
+    }
+
+    function injectKeyword(kw) {
+      // 1. Copy to clipboard
+      navigator.clipboard.writeText(kw).catch(() => {});
+
+      // 2. Automatically inject into technical skills in the visual editor
+      const k8sEl = document.getElementById('skill-k8s-text');
+      const progEl = document.getElementById('skill-prog-text');
+
+      if (kw.toLowerCase().includes('python') || kw.toLowerCase().includes('go') || kw.toLowerCase().includes('bash') || kw.toLowerCase().includes('java')) {
+        if (progEl) {
+          progEl.innerText = `${progEl.innerText}, ${kw}`;
+          progEl.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } else {
+        if (k8sEl) {
+          k8sEl.innerText = `${k8sEl.innerText}, ${kw}`;
+          k8sEl.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+
+      alert(`✅ Copied "${kw}" & appended into Technical Skills in your resume document below!\n\nYou can also click anywhere inside the document to type or edit.`);
     }
 
     async function generateCustomPdf() {
@@ -965,41 +990,7 @@
       const btnDownload = document.getElementById('btnDownloadPdf');
       btn.innerText = 'Generating PDF...';
 
-      const resumeData = {
-        fullName: candidateBaseProfile?.personal.fullName || "Priyanshu Priyesh",
-        headline: candidateBaseProfile?.headline || "Software Engineer / SRE — AWS — Kubernetes — Terraform — Platform Engineering",
-        phone: candidateBaseProfile?.personal.phone || "8809003179",
-        email: candidateBaseProfile?.personal.email || "priyanshupriyesh78@gmail.com",
-        linkedin: candidateBaseProfile?.personal.linkedin || "linkedin.com/in/priyanshu-priyesh-187340233",
-        summary: document.getElementById('editResumeSummary').value,
-        skills: {
-          cloud: document.getElementById('editSkillCloud').value.split(',').map(x => x.trim()).filter(Boolean),
-          kubernetes: document.getElementById('editSkillK8s').value.split(',').map(x => x.trim()).filter(Boolean),
-          iac: document.getElementById('editSkillIaC').value.split(',').map(x => x.trim()).filter(Boolean),
-          cicd: document.getElementById('editSkillCicd').value.split(',').map(x => x.trim()).filter(Boolean),
-          observability: document.getElementById('editSkillObs').value.split(',').map(x => x.trim()).filter(Boolean),
-          security: candidateBaseProfile?.skills.security || [],
-          programming: document.getElementById('editSkillProg').value.split(',').map(x => x.trim()).filter(Boolean)
-        },
-        workExperience: [
-          {
-            company: "Revent Labs",
-            title: "Software Engineer I",
-            location: "Indore, India",
-            dates: "January 2025 – Present",
-            bullets: document.getElementById('editResumeBullets').value.split('\n').map(x => x.trim()).filter(Boolean)
-          }
-        ],
-        education: [
-          {
-            institution: "Lakshmi Narain College of Technology (LNCT)",
-            location: "Bhopal, India",
-            degree: "Bachelor of Technology – Computer Science Engineering",
-            dates: "Graduated: 2025",
-            cgpa: "8.45/10"
-          }
-        ]
-      };
+      const resumeHtml = document.getElementById('visualResumeDoc').innerHTML;
 
       try {
         const res = await fetch('/api/resume/generate-pdf', {
@@ -1007,7 +998,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             company: currentJobForResume.company,
-            resumeData,
+            resumeHtml,
             jobId: currentJobForResume.id
           })
         });
@@ -1017,8 +1008,8 @@
           btnDownload.href = data.downloadUrl;
           btnDownload.classList.remove('hidden');
           btn.innerText = 'Regenerate PDF';
-          alert(`✅ PDF Generated: ${data.filename}\nSaved in /resumes folder and linked in your Sheet!`);
-          fetchJobs(); // refresh note
+          alert(`✅ PDF Generated: ${data.filename}\n\nClick "Download PDF" to save it locally!`);
+          fetchJobs();
         } else {
           alert('PDF Generation notice: ' + data.error);
           btn.innerText = 'Generate & Save PDF';
@@ -1042,8 +1033,25 @@
       document.getElementById('leadDomainLabel').innerText = leadInfo.domain || 'company.com';
       document.getElementById('leadEmailPattern').innerText = leadInfo.emailPattern || `{first}.{last}@${leadInfo.domain}`;
 
-      document.getElementById('leadNetworkingNote').innerText = leadInfo.networkingNote || '';
+      const noteEl = document.getElementById('leadNetworkingNote');
+      if (noteEl) {
+        noteEl.value = leadInfo.networkingNote || '';
+        updateNoteCharCount();
+      }
       lucide.createIcons();
+    }
+
+    function updateNoteCharCount() {
+      const noteEl = document.getElementById('leadNetworkingNote');
+      const counterEl = document.getElementById('noteCharCount');
+      if (!noteEl || !counterEl) return;
+      const len = noteEl.value.length;
+      counterEl.innerText = `${len} / 200 characters`;
+      if (len > 200) {
+        counterEl.className = 'font-mono text-rose-400 font-bold';
+      } else {
+        counterEl.className = 'font-mono text-emerald-400';
+      }
     }
 
     function copyCoverLetter() {
@@ -1054,9 +1062,13 @@
     }
 
     function copyNetworkingNote() {
-      if (currentNetworkingData?.networkingNote) {
-        navigator.clipboard.writeText(currentNetworkingData.networkingNote);
-        alert('200-Word Networking Message copied to clipboard!');
+      const noteEl = document.getElementById('leadNetworkingNote');
+      const text = noteEl ? noteEl.value : (currentNetworkingData?.networkingNote || '');
+      if (text) {
+        navigator.clipboard.writeText(text);
+        alert('LinkedIn Connection Note copied to clipboard!');
+      } else {
+        alert('No note to copy.');
       }
     }
 

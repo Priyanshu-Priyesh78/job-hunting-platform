@@ -53,6 +53,36 @@ export class NetworkFinder {
     return clean ? `${clean}.com` : 'company.com';
   }
 
+  private humanizeAndTrim(text: string, brandName: string): string {
+    let cleaned = text
+      .replace(/^(Subject|Note|Message|Draft|Connection Request):?/i, '')
+      .replace(/^(Dear|Hello there|Hope this finds you well|I am thrilled to reach out|Greetings),?/gi, 'Hi [Name],')
+      .replace(/\b(delve|testament|esteemed|plethora|thrilled|spearheading|harnessing)\b/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Ensure under 200-220 characters
+    if (cleaned.length > 220) {
+      // Split by sentences and keep first sentences that fit
+      const sentences = cleaned.split(/(?<=[.!?])\s+/);
+      let acc = '';
+      for (const s of sentences) {
+        if ((acc + ' ' + s).trim().length <= 210) {
+          acc = (acc + ' ' + s).trim();
+        } else {
+          break;
+        }
+      }
+      cleaned = acc || cleaned.slice(0, 195) + '...';
+    }
+
+    if (!cleaned || cleaned.length < 30) {
+      cleaned = `Hi [Name], fellow LNCT grad here! Love what you're doing at ${brandName}. I manage 14+ production EKS clusters at Revent Labs—would love to connect with fellow SREs here!`;
+    }
+
+    return cleaned;
+  }
+
   async getLeadsAndPitch(company: string, jobTitle: string): Promise<NetworkingLeadInfo> {
     const { brandName, searchTerms } = this.cleanCompany(company);
     const domain = this.cleanDomain(brandName);
@@ -76,11 +106,11 @@ export class NetworkFinder {
           }));
         }
       } catch (err: any) {
-        // Hunter.io notice or rate limit
+        // Hunter.io notice
       }
     }
 
-    // 1. Strict LinkedIn Search URLs (Must have AND between school/role and company)
+    // 1. Strict boolean LinkedIn search queries
     const linkedinSearches = {
       alumni: `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(
         `("LNCT" OR "Lakshmi Narain") AND ${searchTerms}`
@@ -93,7 +123,7 @@ export class NetworkFinder {
       )}`
     };
 
-    // 2. High-precision Google X-Ray Search URLs (Pinpoint LinkedIn profiles without restrictions)
+    // 2. High-precision Google X-Ray Search URLs
     const googleXraySearches = {
       alumni: `https://www.google.com/search?q=${encodeURIComponent(
         `site:linkedin.com/in ("LNCT" OR "Lakshmi Narain") ${searchTerms}`
@@ -106,43 +136,32 @@ export class NetworkFinder {
       )}`
     };
 
-    const prompt = `You are helping Priyanshu Priyesh (Software Engineer / SRE with hands-on experience running 14+ production EKS clusters, Gloo Gateway, Terraform, ArgoCD, and LNCT Bhopal 2025 B.Tech graduate) write a personalized 180-200 word networking / referral message.
+    const prompt = `You are a real human software engineer writing a warm, casual LinkedIn connection request note for Priyanshu Priyesh to someone at ${brandName}.
 
-Target: A contact (fellow LNCT Bhopal alumnus, DevOps engineering lead, or tech recruiter) at ${brandName}.
-Target Job Opening: ${jobTitle} at ${brandName}.
+CRITICAL CONSTRAINT:
+- TOTAL LENGTH MUST BE STRICTLY UNDER 200 CHARACTERS (MAX 210 CHARACTERS). LinkedIn connection request limit is 300 characters.
+- HUMAN TONE ONLY: No robotic AI cliches ("I hope this finds you well", "thrilled", "esteemed", "delve").
+- Write 2 casual, authentic human sentences.
 
-Priyanshu's Profile Highlights:
-- SRE / Platform Engineer at Revent Labs (since Jan 2025).
-- Owned 14+ production EKS clusters across 7 AWS regions and 280+ nodes with zero downtime.
-- IaC with Terraform/Terragrunt, GitOps with ArgoCD, observability with Prometheus/Grafana.
-- Education: Lakshmi Narain College of Technology (LNCT), Bhopal (CSE, 2025, 8.45 CGPA).
+Priyanshu's Profile:
+- SRE at Revent Labs (runs 14+ production EKS clusters, zero downtime).
+- LNCT Bhopal 2025 B.Tech grad.
+- Target Company: ${brandName}.
 
-Write a compelling, respectful, and warm message (around 180-200 words):
-- If the recipient is an LNCT alumnus or colleague at ${brandName}, mention the shared engineering passion / connection.
-- Highlight his verified scale (14+ EKS clusters, multi-region AWS, zero downtime).
-- Express genuine interest in ${brandName}'s infrastructure and the ${jobTitle} role.
-- Ask for a quick 10-minute coffee chat or if they would be comfortable sharing a referral.
+Example 1 (for alumni):
+"Hi [Name], fellow LNCT 2025 grad here! Love what you're building at ${brandName}. I run 14+ EKS clusters at Revent Labs—would love to connect & say hi!"
 
-Provide ONLY the text of the message, written in Priyanshu's voice.`;
+Example 2 (for lead/recruiter):
+"Hi [Name], saw your DevOps work at ${brandName}. I manage 14+ production EKS clusters at Revent Labs and would love to connect with fellow SREs here!"
+
+Output ONLY the final 1-2 sentence connection note. Do not exceed 200 characters.`;
 
     let networkingNote = '';
     try {
       networkingNote = await (this.ai as any).callWithFallback(prompt, false);
-      networkingNote = networkingNote.trim();
+      networkingNote = this.humanizeAndTrim(networkingNote, brandName);
     } catch {
-      networkingNote = `Hi [Name],
-
-I hope you're doing well! I came across your profile while exploring the impressive engineering work being done at ${brandName}, and wanted to reach out.
-
-I am an SRE / Cloud Platform Engineer currently at Revent Labs (and an LNCT Bhopal 2025 CSE graduate). In my current role, I manage and scale 14+ production EKS clusters spanning 7 AWS regions with 280+ nodes, maintaining zero customer-facing downtime. My core stack includes Terraform/Terragrunt, Gloo API Gateway, GitOps with ArgoCD, and Prometheus/Grafana observability.
-
-I recently noticed the ${jobTitle} opening at ${brandName} and felt my production platform engineering background strongly aligns with your infrastructure goals. I would love to connect and learn more about how your team approaches reliability and scale. If you are open to it, I'd deeply appreciate a brief 10-minute conversation or any advice on the team.
-
-Thank you so much for your time!
-
-Best regards,
-Priyanshu Priyesh
-priyanshupriyesh78@gmail.com | 8809003179`;
+      networkingNote = `Hi [Name], fellow LNCT 2025 grad here! Love what you're building at ${brandName}. I run 14+ EKS clusters at Revent Labs—would love to connect with fellow SREs!`;
     }
 
     return {

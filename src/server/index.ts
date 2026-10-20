@@ -177,12 +177,12 @@ app.post('/api/resume/tailor', async (req, res) => {
 // 6. GENERATE AND SAVE CUSTOMIZED RESUME PDF
 app.post('/api/resume/generate-pdf', async (req, res) => {
   try {
-    const { company, resumeData, jobId } = req.body;
-    if (!company || !resumeData) {
-      return res.status(400).json({ success: false, message: 'Company and resumeData required' });
+    const { company, resumeHtml, jobId } = req.body;
+    if (!company || !resumeHtml) {
+      return res.status(400).json({ success: false, message: 'Company and resumeHtml required' });
     }
 
-    const { filename, filePath } = await pdfGenerator.generatePdf(company, resumeData);
+    const { filename, filePath } = await pdfGenerator.generatePdfFromHtml(company, resumeHtml);
 
     // Update job notes and tracking with customized resume name
     if (jobId) {
