@@ -451,31 +451,52 @@
       <!-- TAB 2: NETWORKING, ALUMNI & LEADS -->
       <div id="resumeTabNetworking" class="hidden overflow-y-auto space-y-5 pr-2 flex-1 text-sm">
         
-        <!-- 1-Click LinkedIn Search Links -->
+        <!-- 1-Click Targeted Search Links (LinkedIn & Google X-Ray) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <a id="linkAlumniSearch" href="#" target="_blank" class="p-4 bg-slate-950 border border-slate-800 rounded-xl hover:border-blue-500 transition block space-y-1">
+          <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
             <div class="text-xs font-bold text-blue-400 flex items-center gap-1.5">
               <i data-lucide="graduation-cap" class="w-4 h-4"></i> LNCT Bhopal Alumni
             </div>
-            <p class="text-[11px] text-slate-400">Search alumni from your college at this company</p>
-            <span class="text-[10px] text-blue-400 font-semibold inline-flex items-center gap-1 mt-1">Open LinkedIn <i data-lucide="external-link" class="w-3 h-3"></i></span>
-          </a>
+            <p class="text-[11px] text-slate-400">Find alumni from LNCT Bhopal working at this company</p>
+            <div class="flex items-center space-x-2 pt-1">
+              <a id="linkAlumniLinkedin" href="#" target="_blank" class="px-2.5 py-1 rounded bg-blue-600/30 text-blue-300 border border-blue-500/30 text-[10px] font-semibold hover:bg-blue-600/50 flex items-center gap-1">
+                LinkedIn <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+              <a id="linkAlumniXray" href="#" target="_blank" class="px-2.5 py-1 rounded bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold hover:bg-emerald-600/50 flex items-center gap-1">
+                Google X-Ray <i data-lucide="search" class="w-3 h-3"></i>
+              </a>
+            </div>
+          </div>
 
-          <a id="linkManagerSearch" href="#" target="_blank" class="p-4 bg-slate-950 border border-slate-800 rounded-xl hover:border-indigo-500 transition block space-y-1">
+          <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
             <div class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
               <i data-lucide="shield" class="w-4 h-4"></i> Engineering Leads & SRE
             </div>
             <p class="text-[11px] text-slate-400">Find DevOps Leads & Engineering Managers</p>
-            <span class="text-[10px] text-indigo-400 font-semibold inline-flex items-center gap-1 mt-1">Open LinkedIn <i data-lucide="external-link" class="w-3 h-3"></i></span>
-          </a>
+            <div class="flex items-center space-x-2 pt-1">
+              <a id="linkManagerLinkedin" href="#" target="_blank" class="px-2.5 py-1 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold hover:bg-indigo-600/50 flex items-center gap-1">
+                LinkedIn <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+              <a id="linkManagerXray" href="#" target="_blank" class="px-2.5 py-1 rounded bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold hover:bg-emerald-600/50 flex items-center gap-1">
+                Google X-Ray <i data-lucide="search" class="w-3 h-3"></i>
+              </a>
+            </div>
+          </div>
 
-          <a id="linkRecruiterSearch" href="#" target="_blank" class="p-4 bg-slate-950 border border-slate-800 rounded-xl hover:border-emerald-500 transition block space-y-1">
+          <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
             <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
               <i data-lucide="user-check" class="w-4 h-4"></i> Tech Recruiters
             </div>
             <p class="text-[11px] text-slate-400">Find Talent Acquisition / Recruiters</p>
-            <span class="text-[10px] text-emerald-400 font-semibold inline-flex items-center gap-1 mt-1">Open LinkedIn <i data-lucide="external-link" class="w-3 h-3"></i></span>
-          </a>
+            <div class="flex items-center space-x-2 pt-1">
+              <a id="linkRecruiterLinkedin" href="#" target="_blank" class="px-2.5 py-1 rounded bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold hover:bg-emerald-600/50 flex items-center gap-1">
+                LinkedIn <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+              <a id="linkRecruiterXray" href="#" target="_blank" class="px-2.5 py-1 rounded bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold hover:bg-emerald-600/50 flex items-center gap-1">
+                Google X-Ray <i data-lucide="search" class="w-3 h-3"></i>
+              </a>
+            </div>
+          </div>
         </div>
 
         <!-- Hunter.io Company Email Pattern -->
@@ -1009,9 +1030,14 @@
     }
 
     function populateNetworkingTab(leadInfo) {
-      document.getElementById('linkAlumniSearch').href = leadInfo.linkedinSearches.alumni;
-      document.getElementById('linkManagerSearch').href = leadInfo.linkedinSearches.managers;
-      document.getElementById('linkRecruiterSearch').href = leadInfo.linkedinSearches.recruiters;
+      document.getElementById('linkAlumniLinkedin').href = leadInfo.linkedinSearches.alumni;
+      document.getElementById('linkAlumniXray').href = leadInfo.googleXraySearches.alumni;
+
+      document.getElementById('linkManagerLinkedin').href = leadInfo.linkedinSearches.managers;
+      document.getElementById('linkManagerXray').href = leadInfo.googleXraySearches.managers;
+
+      document.getElementById('linkRecruiterLinkedin').href = leadInfo.linkedinSearches.recruiters;
+      document.getElementById('linkRecruiterXray').href = leadInfo.googleXraySearches.recruiters;
 
       document.getElementById('leadDomainLabel').innerText = leadInfo.domain || 'company.com';
       document.getElementById('leadEmailPattern').innerText = leadInfo.emailPattern || `{first}.{last}@${leadInfo.domain}`;

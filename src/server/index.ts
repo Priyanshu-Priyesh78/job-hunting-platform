@@ -206,14 +206,22 @@ app.post('/api/resume/generate-pdf', async (req, res) => {
 
 // 7. DOWNLOAD GENERATED PDF
 app.get('/api/resumes/download/:filename', (req, res) => {
-  const { filename } = req.params;
-  const filePath = path.join(process.cwd(), 'resumes', path.basename(filename));
+  const filename = path.basename(decodeURIComponent(req.params.filename));
+  const filePath = path.resolve(process.cwd(), 'resumes', filename);
 
   if (!fs.existsSync(filePath)) {
-    return res.status(404).send('Resume PDF not found');
+    return res.status(404).send('Resume PDF not found on server. Please click "Generate & Save PDF" first.');
   }
 
-  res.download(filePath, filename);
+  const stat = fs.statSync(filePath);
+  res.writeHead(200, {
+    'Content-Type': 'application/pdf',
+    'Content-Length': stat.size,
+    'Content-Disposition': `attachment; filename="${filename}"`
+  });
+
+  const stream = fs.createReadStream(filePath);
+  stream.pipe(res);
 });
 
 // 8. NETWORKING, ALUMNI & EMAIL LEADS
