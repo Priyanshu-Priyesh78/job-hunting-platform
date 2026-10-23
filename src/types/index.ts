@@ -5,6 +5,10 @@ export interface JobListing {
   company: string;
   location: string;
   experienceRequired: string;
+  detectedYearsRequired?: string;
+  isExperienceMatch?: boolean;
+  experienceVerdict?: 'PERFECT_FIT' | 'JUSTIFIABLE_BY_SCALE' | 'EXPERIENCE_GAP' | 'UNQUALIFIED_SENIOR';
+  hrExperienceNotes?: string;
   postedDate?: string;
   url: string;
   description?: string;
@@ -91,6 +95,10 @@ export interface SearchConfig {
 export interface JDAnalysisResult {
   matchScore: number;
   recommendation: 'HIGHLY_RECOMMENDED' | 'GOOD_MATCH' | 'WEAK_MATCH' | 'NOT_RECOMMENDED';
+  detectedYearsRequired: string;
+  isExperienceMatch: boolean;
+  experienceVerdict: 'PERFECT_FIT' | 'JUSTIFIABLE_BY_SCALE' | 'EXPERIENCE_GAP' | 'UNQUALIFIED_SENIOR';
+  hrExperienceNotes: string;
   matchedKeywords: string[];
   missingKeywords: string[];
   jdSummary: string;

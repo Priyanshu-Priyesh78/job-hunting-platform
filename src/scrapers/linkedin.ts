@@ -20,12 +20,13 @@ export class LinkedInScraper extends BaseScraper {
     if (timeFilter === '6h' || timeFilter === 'past_6_hours') tpr = 'r21600';
     else if (timeFilter === '24h' || timeFilter === 'past_24_hours') tpr = 'r86400';
 
-    console.log(`[LinkedIn] Searching for "${query}" in "${location}" (Time: ${timeFilter}, Entry / 0-2 yrs)...`);
+    console.log(`[LinkedIn] Searching for "${query}" in "${location}" (Time: ${timeFilter}, Levels: Internship/Entry/Associate)...`);
 
-    for (let start = 0; start < limit && jobs.length < limit; start += 25) {
+    for (let start = 0; start < limit && jobs.length < limit; ) {
+      // f_E=1,2,3 includes Internship, Entry level, and Associate (covering 0-3 years)
       const url = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(
         query
-      )}&location=${encodeURIComponent(location)}&f_E=2&f_TPR=${tpr}&start=${start}`;
+      )}&location=${encodeURIComponent(location)}&f_E=1,2,3&f_TPR=${tpr}&start=${start}`;
 
       try {
         const response = await axios.get(url, {
@@ -40,12 +41,13 @@ export class LinkedInScraper extends BaseScraper {
 
         const $ = cheerio.load(response.data);
         const jobCards = $('li');
+        const cardCount = jobCards.length;
 
-        if (jobCards.length === 0) {
+        if (cardCount === 0) {
           break;
         }
 
-        for (let i = 0; i < jobCards.length && jobs.length < limit; i++) {
+        for (let i = 0; i < cardCount && jobs.length < limit; i++) {
           const card = $(jobCards[i]);
           const title = card.find('.base-search-card__title').text().trim();
           const company = card.find('.base-search-card__subtitle').text().trim();
@@ -69,7 +71,7 @@ export class LinkedInScraper extends BaseScraper {
               title,
               company,
               location: jobLocation || location,
-              experienceRequired: '0-2 years (Entry Level)',
+              experienceRequired: '0-3 years (Junior / Associate)',
               postedDate,
               url: link,
               status: 'NEW',
@@ -78,26 +80,43 @@ export class LinkedInScraper extends BaseScraper {
           }
         }
 
-        await this.delay(1500);
+        // Advance start by the actual cards returned (typically 10)
+        start += cardCount;
+
+        if (cardCount < 10) {
+          break; // Last page reached
+        }
+
+        await this.delay(1200);
       } catch (err: any) {
         console.warn(`[LinkedIn] Guest search notice: ${err.message}. Switching to browser search...`);
         return this.searchJobsViaBrowser(query, location);
       }
     }
 
-    // Now fetch description snippet for top jobs
-    for (const job of jobs.slice(0, 10)) {
-      if (!job.description && job.url) {
-        try {
-          const desc = await this.fetchJobDescription(job.url);
-          if (desc) {
-            job.description = desc;
+    // Concurrently fetch job descriptions in small batches (chunks of 4)
+    const jobsNeedingDesc = jobs.filter(j => !j.description && j.url).slice(0, 20);
+    const chunkSize = 4;
+    for (let i = 0; i < jobsNeedingDesc.length; i += chunkSize) {
+      const chunk = jobsNeedingDesc.slice(i, i + chunkSize);
+      await Promise.all(
+        chunk.map(async (job) => {
+          try {
+            const desc = await this.fetchJobDescription(job.url);
+            if (desc) {
+              job.description = desc;
+              // Extract experience hints from description text
+              const expMatch = desc.match(/(\d+)\s*(?:-|to|\+)\s*(\d+)?\s*(?:years?|yrs?)/i);
+              if (expMatch) {
+                job.detectedYearsRequired = expMatch[0];
+              }
+            }
+          } catch {
+            // ignore
           }
-          await this.delay(1000);
-        } catch (e) {
-          // ignore individual fetch errors
-        }
-      }
+        })
+      );
+      await this.delay(600);
     }
 
     return jobs;

@@ -144,8 +144,8 @@
     </div>
 
     <!-- FILTER & SEARCH BAR -->
-    <div class="glass p-4 rounded-2xl flex flex-wrap gap-4 items-center justify-between border border-slate-800">
-      <div class="flex items-center space-x-3 flex-1 min-w-[280px]">
+    <div class="glass p-4 rounded-2xl flex flex-wrap gap-3 items-center justify-between border border-slate-800">
+      <div class="flex items-center space-x-3 flex-1 min-w-[260px]">
         <div class="relative w-full">
           <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
           <input type="text" id="searchInput" oninput="renderCategorizedJobs()" placeholder="Search title, company, skills, or location..."
@@ -153,15 +153,35 @@
         </div>
       </div>
 
-      <!-- PLATFORM SELECT -->
-      <select id="platformFilter" onchange="renderCategorizedJobs()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none">
-        <option value="ALL">All Platforms</option>
-        <option value="linkedin">LinkedIn</option>
-        <option value="naukri">Naukri</option>
-        <option value="indeed">Indeed</option>
-        <option value="wellfound">Wellfound</option>
-        <option value="instahyre">Instahyre</option>
-      </select>
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- EXPERIENCE FILTER -->
+        <select id="experienceFilter" onchange="renderCategorizedJobs()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none font-medium">
+          <option value="ALL">All Experience Levels</option>
+          <option value="QUALIFIED" selected>🎯 0-3 Yrs (Ideal & Scale Justified)</option>
+          <option value="PERFECT_FIT">🟢 0-2 Yrs (Ideal Fit Only)</option>
+          <option value="NO_SENIORS">🚫 Exclude 5+ Yrs (No Senior/Staff)</option>
+        </select>
+
+        <!-- ROLE FILTER -->
+        <select id="roleCategoryFilter" onchange="renderCategorizedJobs()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none font-medium">
+          <option value="ALL">All Roles</option>
+          <option value="sre">SRE / Reliability</option>
+          <option value="devops">DevOps</option>
+          <option value="cloud">Cloud Engineer</option>
+          <option value="platform">Platform Engineer</option>
+          <option value="kubernetes">Kubernetes / Containers</option>
+        </select>
+
+        <!-- PLATFORM SELECT -->
+        <select id="platformFilter" onchange="renderCategorizedJobs()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none font-medium">
+          <option value="ALL">All Platforms</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="naukri">Naukri</option>
+          <option value="indeed">Indeed</option>
+          <option value="wellfound">Wellfound</option>
+          <option value="instahyre">Instahyre</option>
+        </select>
+      </div>
     </div>
 
     <!-- COLLAPSIBLE CATEGORIZED SECTIONS -->
@@ -273,8 +293,41 @@
 
       <div class="space-y-4 text-sm">
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Target Role</label>
-          <input type="text" id="scanRoleInput" value="DevOps Engineer" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-semibold text-slate-300">Target Roles to Scrape (Multi-Role)</label>
+            <div class="space-x-2 text-[11px]">
+              <button type="button" onclick="toggleAllRoles(true)" class="text-blue-400 hover:underline">Select All</button>
+              <span class="text-slate-600">|</span>
+              <button type="button" onclick="toggleAllRoles(false)" class="text-slate-400 hover:underline">Clear</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs mb-2">
+            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="DevOps Engineer" checked class="rounded text-blue-600">
+              <span class="font-medium text-slate-200">DevOps Engineer</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="Site Reliability Engineer" checked class="rounded text-blue-600">
+              <span class="font-medium text-slate-200">SRE / Reliability</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="Cloud Engineer" checked class="rounded text-blue-600">
+              <span class="font-medium text-slate-200">Cloud Engineer</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="Platform Engineer" checked class="rounded text-blue-600">
+              <span class="font-medium text-slate-200">Platform Engineer</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="Infrastructure Engineer" class="rounded text-blue-600">
+              <span class="font-medium text-slate-200">Infrastructure Eng</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="Kubernetes Engineer" class="rounded text-blue-600">
+              <span class="font-medium text-slate-200">Kubernetes Engineer</span>
+            </label>
+          </div>
+          <input type="text" id="scanCustomRoleInput" placeholder="Or enter specific custom role (optional)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500">
         </div>
 
         <div>
@@ -368,6 +421,25 @@
       <!-- TAB 1: VISUAL RESUME DOCUMENT EDITOR (EXACT LATEX REPLICA) -->
       <div id="resumeTabEditor" class="hidden overflow-y-auto space-y-4 pr-1 flex-1 text-sm">
         
+        <!-- ATS Recruiter Screening Evaluation Banner -->
+        <div id="atsRecruiterEvaluationBanner" class="bg-slate-950 border border-blue-900/40 p-3.5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div class="flex items-start space-x-3">
+            <div id="atsModalVerdictIcon" class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+              <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span id="atsModalVerdictTitle" class="text-xs font-bold text-white uppercase tracking-wider">Enterprise ATS & Recruiter Fit Evaluation</span>
+                <span id="atsModalExpBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold">1-3 Yrs Required</span>
+              </div>
+              <p id="atsModalVerdictNotes" class="text-xs text-slate-300 mt-1">Recruiter is analyzing your resume fit against this JD...</p>
+            </div>
+          </div>
+          <div class="shrink-0 text-right">
+            <span id="atsModalScoreBadge" class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">Match: --%</span>
+          </div>
+        </div>
+
         <!-- Missing ATS Keywords Header -->
         <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-2">
           <div class="flex items-center justify-between">
@@ -846,12 +918,35 @@
     function renderCategorizedJobs() {
       const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
       const platform = document.getElementById('platformFilter').value;
+      const expFilter = document.getElementById('experienceFilter')?.value || 'QUALIFIED';
+      const roleFilter = document.getElementById('roleCategoryFilter')?.value || 'ALL';
 
-      // Filter by search & platform
+      // Filter by search, platform, experience, and role
       const filtered = allJobs.filter(j => {
         if (platform !== 'ALL' && j.platform?.toLowerCase() !== platform.toLowerCase()) return false;
+
+        // Role category filter
+        if (roleFilter !== 'ALL') {
+          const t = (j.title || '').toLowerCase();
+          if (roleFilter === 'sre' && !t.includes('sre') && !t.includes('reliability')) return false;
+          if (roleFilter === 'devops' && !t.includes('devops')) return false;
+          if (roleFilter === 'cloud' && !t.includes('cloud')) return false;
+          if (roleFilter === 'platform' && !t.includes('platform')) return false;
+          if (roleFilter === 'kubernetes' && !t.includes('kubernetes') && !t.includes('k8s') && !t.includes('container')) return false;
+        }
+
+        // Experience filter
+        const v = j.experienceVerdict || '';
+        const titleLower = (j.title || '').toLowerCase();
+        const isSenior = v === 'UNQUALIFIED_SENIOR' || /\b(senior|sr\.|sr|lead|staff|principal|director|architect)\b/i.test(titleLower);
+
+        if (expFilter === 'QUALIFIED' && isSenior) return false;
+        if (expFilter === 'PERFECT_FIT' && v !== 'PERFECT_FIT' && !(j.detectedYearsRequired && j.detectedYearsRequired.includes('0-2'))) return false;
+        if (expFilter === 'NO_SENIORS' && isSenior) return false;
+
+        // Search keyword matching
         if (search) {
-          const matchText = `${j.title} ${j.company} ${j.location} ${(j.matchedKeywords || []).join(' ')}`.toLowerCase();
+          const matchText = `${j.title} ${j.company} ${j.location} ${(j.matchedKeywords || []).join(' ')} ${j.hrExperienceNotes || ''}`.toLowerCase();
           if (!matchText.includes(search)) return false;
         }
         return true;
@@ -881,7 +976,7 @@
       document.getElementById('badgeRejectedCount').innerText = rejectedJobs.length;
 
       // Render each container
-      renderJobSection('secNew', newJobs, 'No new jobs found matching filters.');
+      renderJobSection('secNew', newJobs, 'No new jobs found matching filters. Try adjusting experience or role filters above.');
       renderJobSection('secReviewed', reviewedJobs, 'No jobs in review.');
       renderJobSection('secApplied', appliedJobs, 'No applied jobs.');
       renderJobSection('secInterview', interviewJobs, 'No active interview calls.');
@@ -907,6 +1002,31 @@
 
         const status = job.status || 'NEW';
 
+        // Experience Badge
+        const expVerdict = job.experienceVerdict || '';
+        let expBadge = '';
+        if (expVerdict === 'PERFECT_FIT' || (job.detectedYearsRequired && job.detectedYearsRequired.includes('0-2'))) {
+          expBadge = `<span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 0-2 Yrs (Ideal Fit)
+          </span>`;
+        } else if (expVerdict === 'JUSTIFIABLE_BY_SCALE' || (job.detectedYearsRequired && (job.detectedYearsRequired.includes('1-3') || job.detectedYearsRequired.includes('2-3') || job.detectedYearsRequired.includes('2-4')))) {
+          expBadge = `<span class="px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/30 text-[10px] font-bold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> 1-3 Yrs (Scale Justified)
+          </span>`;
+        } else if (expVerdict === 'EXPERIENCE_GAP') {
+          expBadge = `<span class="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-bold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> 3-5 Yrs (Stretch)
+          </span>`;
+        } else if (expVerdict === 'UNQUALIFIED_SENIOR') {
+          expBadge = `<span class="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 text-[10px] font-bold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> 5+ Yrs (Senior - Skip)
+          </span>`;
+        } else {
+          expBadge = `<span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-medium">
+            ${job.detectedYearsRequired || job.experienceRequired || '0-2 Yrs'}
+          </span>`;
+        }
+
         const matchedTags = (job.matchedKeywords || []).slice(0, 4).map(k => `
           <span class="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-300 border border-blue-500/20 text-[10px] font-medium">${k}</span>
         `).join('');
@@ -919,8 +1039,17 @@
           ? `<span class="text-[10px] text-emerald-400 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-700/50">📄 ${job.notes.split('Custom Resume:')[1].trim()}</span>`
           : '';
 
+        const hrCallout = job.hrExperienceNotes ? `
+          <div class="mt-2 text-[11px] text-slate-300 bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5"></i>
+            <span><strong class="text-blue-300">Recruiter Screening Verdict:</strong> ${job.hrExperienceNotes}</span>
+          </div>
+        ` : '';
+
+        const isSeniorMuted = expVerdict === 'UNQUALIFIED_SENIOR' ? 'opacity-75 bg-slate-950/30 border-slate-800/60' : '';
+
         return `
-          <div class="glass-card p-4 rounded-xl transition duration-150">
+          <div class="glass-card p-4 rounded-xl transition duration-150 ${isSeniorMuted}">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
               
               <!-- Left Info -->
@@ -938,6 +1067,7 @@
                     <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-medium uppercase">
                       ${job.platform}
                     </span>
+                    ${expBadge}
                     ${customResumeNote}
                   </div>
 
@@ -957,6 +1087,8 @@
                     ${matchedTags}
                     ${missingTags ? `<span class="text-[9px] text-slate-500 ml-1">Missing:</span> ${missingTags}` : ''}
                   </div>
+
+                  ${hrCallout}
                 </div>
               </div>
 
@@ -1091,6 +1223,29 @@
       document.getElementById('generatedPdfNameLabel').innerText = 
         `Will save as: PRIYANSHU_PRIYESH_${job.company.toUpperCase().replace(/[^A-Z0-9]/g, '_')}.pdf`;
 
+      // Set initial ATS banner data from job listing
+      const expBannerYears = job.detectedYearsRequired || job.experienceRequired || '0-2 Yrs';
+      const expBannerNotes = job.hrExperienceNotes || 'Analyzing role requirements and candidate scale...';
+      const score = job.matchScore || '--';
+
+      document.getElementById('atsModalExpBadge').innerText = expBannerYears;
+      document.getElementById('atsModalVerdictNotes').innerText = expBannerNotes;
+      document.getElementById('atsModalScoreBadge').innerText = `Match: ${score}%`;
+
+      if (job.experienceVerdict === 'PERFECT_FIT') {
+        document.getElementById('atsModalVerdictTitle').innerText = 'PERFECT FIT (0-2 YRS JUNIOR/ASSOCIATE)';
+        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-emerald-400 uppercase tracking-wider';
+      } else if (job.experienceVerdict === 'JUSTIFIABLE_BY_SCALE') {
+        document.getElementById('atsModalVerdictTitle').innerText = 'JUSTIFIABLE FIT (SCALE OUTCLASSES 2-3 YRS)';
+        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-blue-400 uppercase tracking-wider';
+      } else if (job.experienceVerdict === 'EXPERIENCE_GAP') {
+        document.getElementById('atsModalVerdictTitle').innerText = 'STRETCH ROLE (EXPERIENCE GAP IDENTIFIED)';
+        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-amber-400 uppercase tracking-wider';
+      } else if (job.experienceVerdict === 'UNQUALIFIED_SENIOR') {
+        document.getElementById('atsModalVerdictTitle').innerText = 'EXPERIENCE MISMATCH (5+ YRS SENIOR / STAFF)';
+        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-rose-400 uppercase tracking-wider';
+      }
+
       switchResumeTab('editor');
 
       // 2. Set analyzing status on the Missing Keywords bar (NOT blocking the document)
@@ -1151,6 +1306,30 @@
     }
 
     function populateResumeEditor(tailored, job) {
+      // 0. Update ATS Recruiter Evaluation Banner
+      if (tailored.detectedYearsRequired) {
+        document.getElementById('atsModalExpBadge').innerText = `${tailored.detectedYearsRequired}`;
+      }
+      if (tailored.hrExperienceNotes) {
+        document.getElementById('atsModalVerdictNotes').innerText = tailored.hrExperienceNotes;
+      }
+      if (tailored.experienceVerdict) {
+        const v = tailored.experienceVerdict;
+        if (v === 'PERFECT_FIT') {
+          document.getElementById('atsModalVerdictTitle').innerText = 'PERFECT FIT (0-2 YRS JUNIOR/ASSOCIATE)';
+          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-emerald-400 uppercase tracking-wider';
+        } else if (v === 'JUSTIFIABLE_BY_SCALE') {
+          document.getElementById('atsModalVerdictTitle').innerText = 'JUSTIFIABLE FIT (SCALE OUTCLASSES 2-3 YRS)';
+          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-blue-400 uppercase tracking-wider';
+        } else if (v === 'EXPERIENCE_GAP') {
+          document.getElementById('atsModalVerdictTitle').innerText = 'STRETCH ROLE (EXPERIENCE GAP IDENTIFIED)';
+          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-amber-400 uppercase tracking-wider';
+        } else if (v === 'UNQUALIFIED_SENIOR') {
+          document.getElementById('atsModalVerdictTitle').innerText = 'EXPERIENCE MISMATCH (5+ YRS SENIOR / STAFF)';
+          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-rose-400 uppercase tracking-wider';
+        }
+      }
+
       // 1. Missing keywords with 1-click add buttons
       const missingContainer = document.getElementById('clickableMissingPills');
       const missingList = tailored.missingKeywords || [];
@@ -1323,8 +1502,22 @@
     function openScanModal() { document.getElementById('scanModal').classList.remove('hidden'); }
     function closeScanModal() { document.getElementById('scanModal').classList.add('hidden'); }
 
+    function toggleAllRoles(selectAll) {
+      document.querySelectorAll('input[name="scan_role"]').forEach(cb => cb.checked = selectAll);
+    }
+
     async function triggerScan() {
-      const role = document.getElementById('scanRoleInput').value;
+      const selectedRoles = Array.from(document.querySelectorAll('input[name="scan_role"]:checked')).map(cb => cb.value);
+      const customRole = (document.getElementById('scanCustomRoleInput')?.value || '').trim();
+      if (customRole && !selectedRoles.includes(customRole)) {
+        selectedRoles.push(customRole);
+      }
+
+      if (selectedRoles.length === 0) {
+        alert('Please select at least one role to scan!');
+        return;
+      }
+
       const location = document.getElementById('scanLocationInput').value;
       const timeFilter = document.getElementById('scanTimeFilter').value;
       const enableAI = document.getElementById('scanEnableAI').checked;
@@ -1341,7 +1534,7 @@
       await fetch('/api/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role, location, timeFilter, platforms, enableAI })
+        body: JSON.stringify({ roles: selectedRoles, location, timeFilter, platforms, enableAI })
       });
 
       // Poll progress every 1.5s

@@ -11,7 +11,7 @@ import { ScraperManager } from '../scrapers/index.js';
 import { GeminiAI } from '../ai/gemini.js';
 import { FormAutofiller } from '../autofill/browser_autofill.js';
 import { ResumeTailorer } from '../ai/resume_tailorer.js';
-import { ResumePdfGenerator, ResumeData } from '../ai/pdf_generator.js';
+import { ResumePdfGenerator } from '../ai/pdf_generator.js';
 import { NetworkFinder } from '../ai/network_finder.js';
 import { CandidateProfile, SearchConfig } from '../types/index.js';
 
@@ -61,7 +61,7 @@ app.get('/api/jobs', async (req, res) => {
       reviewed: jobs.filter((j) => j.status === 'REVIEWED').length,
       applied: jobs.filter((j) => j.status === 'APPLIED').length,
       interview: jobs.filter((j) => j.status === 'INTERVIEW').length,
-      rejected: jobs.filter((j) => j.status === 'REJECTED' || j.status === 'NOT_INTERESTED').length,
+      rejected: jobs.filter((j) => j.status === 'REJECTED' || (j.status as string) === 'NOT_INTERESTED').length,
       highlyRecommended: jobs.filter(
         (j) => j.recommendation === 'HIGHLY_RECOMMENDED' || (j.matchScore || 0) >= 80
       ).length
@@ -84,24 +84,29 @@ app.post('/api/scan', async (req, res) => {
     return res.status(409).json({ success: false, message: 'Scan already in progress' });
   }
 
-  const { platforms, role, location, timeFilter, enableAI } = req.body;
+  const { platforms, roles, role, location, timeFilter, enableAI } = req.body;
+  const targetRoles = roles && Array.isArray(roles) && roles.length > 0
+    ? roles
+    : role
+    ? [role]
+    : searchConfig.targetRoles.slice(0, 4);
 
   scanProgress = {
     isScanning: true,
     percent: 15,
     stage: 'Initializing Scanners',
-    detail: `Preparing query for ${role || 'DevOps Engineer'} (${timeFilter || 'week'})...`
+    detail: `Preparing query for ${targetRoles.join(', ')} (${timeFilter || 'week'})...`
   };
 
   (async () => {
     try {
       scanProgress.percent = 30;
       scanProgress.stage = 'Scraping Portals';
-      scanProgress.detail = `Scanning ${platforms ? platforms.join(', ') : 'all platforms'}...`;
+      scanProgress.detail = `Scanning ${platforms ? platforms.join(', ') : 'selected platforms'} for ${targetRoles.length} target role(s)...`;
 
       const jobs = await scraperManager.runScan({
         platforms,
-        role: role || searchConfig.targetRoles[0],
+        roles: targetRoles,
         location: location || 'India',
         timeFilter: timeFilter || 'week',
         enableAIAnalysis: enableAI ?? true
@@ -109,7 +114,7 @@ app.post('/api/scan', async (req, res) => {
 
       scanProgress.percent = 75;
       scanProgress.stage = 'Filtering & Deduplication';
-      scanProgress.detail = `Processing ${jobs.length} candidate jobs and matching keywords...`;
+      scanProgress.detail = `Processing ${jobs.length} candidate jobs, screening experience & matching keywords...`;
 
       await store.saveJobs(jobs);
 
@@ -122,7 +127,7 @@ app.post('/api/scan', async (req, res) => {
 
       scanProgress.percent = 100;
       scanProgress.stage = 'Completed';
-      scanProgress.detail = `Scan finished! Saved ${jobs.length} jobs.`;
+      scanProgress.detail = `Scan finished! Saved ${jobs.length} jobs across ${targetRoles.length} role(s).`;
     } catch (err: any) {
       scanProgress.stage = 'Error';
       scanProgress.detail = `Error: ${err.message}`;

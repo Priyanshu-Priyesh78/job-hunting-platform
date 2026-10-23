@@ -73,16 +73,17 @@ export class GeminiAI {
     profile: CandidateProfile,
     targetKeywords: string[]
   ): Promise<JDAnalysisResult> {
-    const prompt = `You are an expert technical recruiter and SRE/DevOps hiring manager.
-Analyze the following Job Description against the Candidate's profile and technical keywords.
+    const prompt = `You are a Principal Technical Recruiter and Head of Talent Acquisition specializing in Infrastructure, SRE, Platform Engineering, and Cloud Architecture, operating an enterprise ATS screening engine.
+You are evaluating a candidate's fit for an engineering job posting.
 
 ### Candidate Profile:
 Name: ${profile.personal.fullName}
+Degree: B.Tech Computer Science Engineering (Graduated 2025, CGPA: 8.45/10, LNCT Bhopal)
 Current Title: ${profile.headline}
 Experience: ${profile.experienceYears} years (${profile.experienceLevel})
 Current Role: Software Engineer I at Revent Labs (Jan 2025 - Present)
-Key Highlights:
-- Owned 14+ production EKS clusters spanning 7 AWS regions and 280+ nodes, quarterly zero-downtime upgrades.
+Key Highlights & Production Scale:
+- Owned 14+ production EKS clusters spanning 7 AWS regions and 280+ nodes with zero downtime upgrades.
 - Gateway Engineering team: Gloo Gateway Proxy, RateLimit, ExtAuth pods, network troubleshooting.
 - Managed multi-region AWS WAF, Global Accelerator, ALB, Route 53, Shield Advanced, S3/Athena log analytics.
 - Managed and standardized Terraform/Terragrunt across 13+ projects and multiple AWS accounts with Atlantis.
@@ -99,44 +100,79 @@ Observability: ${profile.skills.observability.join(', ')}
 ### Target Keywords to look for:
 ${targetKeywords.join(', ')}
 
-### Job Posting:
+### Job Posting to Evaluate:
 Company: ${job.company}
 Title: ${job.title}
 Location: ${job.location || 'Not specified'}
 Job Description:
-${job.description.slice(0, 4000)}
+${job.description.slice(0, 4500)}
 
-### Instructions:
-Return a valid JSON object matching this schema:
+### Evaluation Guidelines (Think like a Senior Technical HR Recruiter & ATS):
+1. **Experience Detection**: Inspect the job title and description for experience requirements (e.g. 0-2 yrs, 1-3 yrs, 3-5 yrs, 5+ yrs, Senior/Lead/Staff/Principal).
+2. **Experience Verdict & Match Quality**:
+   - "PERFECT_FIT": 0–2 years required or Entry/Junior level. Priyanshu is in top 1% due to 14+ cluster production scale. Match score 85-98%.
+   - "JUSTIFIABLE_BY_SCALE": 2–4 years required or Mid-level. Priyanshu's multi-region 14+ cluster ownership, Gloo Gateway, and GitOps scale easily outclasses typical 3-year engineers. Candidate is qualified. Match score 75-92%.
+   - "EXPERIENCE_GAP": 4–5 years required. Stretch role. Candidate can apply if tech stack strongly aligns, but notes experience gap. Match score 50-68%.
+   - "UNQUALIFIED_SENIOR": 5+ years, 7+ years, 8+ years, or Senior/Staff/Principal/Lead titles. Flag strictly as EXPERIENCE_MISMATCH. Demote match score to below 40% and set recommendation to "NOT_RECOMMENDED" so user does not waste time applying.
+3. **HR Screening Rationale**: Write 1-2 realistic, human sentences from the recruiter's viewpoint explaining the screening verdict (e.g. "Role asks for 2-3 years. Priyanshu's production scale managing 14+ EKS clusters across 7 AWS regions with Atlantis and Gloo Gateway justifies advancing him to phone screen.").
+4. **ATS Keywords**: Trace all matched technical skills and highlight critical missing technologies.
+5. **Resume Tweaks**: 3 concrete, actionable bullets for tailoring Priyanshu's resume to this specific opening.
+6. **Application Pitch**: A crisp 120-150 word application pitch highlighting his 14+ clusters, GitOps, and platform engineering skills.
+
+### Return Format:
+Return ONLY a valid JSON object matching this schema:
 {
-  "matchScore": number (0 to 100 integer representing match quality for 0-2 yrs candidate),
+  "detectedYearsRequired": "string (e.g. '0-2 years', '2-4 years', '3-5 years', '5+ years', or 'Not specified')",
+  "isExperienceMatch": boolean (true if <= 4 years or junior/mid; false if strictly 5+ years or senior/staff),
+  "experienceVerdict": "PERFECT_FIT" | "JUSTIFIABLE_BY_SCALE" | "EXPERIENCE_GAP" | "UNQUALIFIED_SENIOR",
+  "hrExperienceNotes": "string (1-2 sentences with recruiter's exact screening rationale)",
+  "matchScore": number (0 to 100 integer reflecting ATS + experience fit),
   "recommendation": "HIGHLY_RECOMMENDED" | "GOOD_MATCH" | "WEAK_MATCH" | "NOT_RECOMMENDED",
-  "matchedKeywords": string[] (list of keywords from our target list or skills that the JD asks for and candidate has),
-  "missingKeywords": string[] (important skills asked by the JD that the candidate might lack or should highlight),
-  "jdSummary": string (2-3 concise sentences summarizing key responsibilities, tech stack, and experience requirement),
-  "resumeTweaks": string[] (2-3 specific bullet points recommending which parts of Priyanshu's real experience to emphasize for this role),
-  "draftCoverLetter": string (A crisp 120-150 word application note pitch tailored specifically to this company and role, highlighting 14+ EKS clusters, Gloo Gateway, GitOps, and SRE incident response)
+  "matchedKeywords": ["string"],
+  "missingKeywords": ["string"],
+  "jdSummary": "string (2-3 concise sentences summarizing key responsibilities and tech stack)",
+  "resumeTweaks": ["string", "string", "string"],
+  "draftCoverLetter": "string (Crisp 120-150 word tailored application pitch)"
 }
 
 Provide ONLY the valid JSON response.`;
 
     const rawResponse = await this.callWithFallback(prompt, true);
+    let parsed: any;
     try {
-      const parsed = JSON.parse(rawResponse);
-      return {
-        matchScore: parsed.matchScore ?? 50,
-        recommendation: parsed.recommendation ?? 'GOOD_MATCH',
-        matchedKeywords: parsed.matchedKeywords ?? [],
-        missingKeywords: parsed.missingKeywords ?? [],
-        jdSummary: parsed.jdSummary ?? '',
-        resumeTweaks: parsed.resumeTweaks ?? [],
-        draftCoverLetter: parsed.draftCoverLetter ?? ''
-      };
+      parsed = JSON.parse(rawResponse);
     } catch (e) {
-      // Clean JSON markdown blocks if present
       const cleaned = rawResponse.replace(/```json/g, '').replace(/```/g, '').trim();
-      return JSON.parse(cleaned);
+      parsed = JSON.parse(cleaned);
     }
+
+    // Safety guardrails for Senior / Staff / 5+ years positions
+    const titleLower = job.title.toLowerCase();
+    const isStrictSenior = /\b(senior|sr\.|sr|lead|staff|principal|director|head of|vp|architect)\b/i.test(titleLower) &&
+      !titleLower.includes('junior') && !titleLower.includes('associate');
+    const isSeniorYears = /\b([5-9]|1[0-5])\+?\s*(?:to|-)?\s*(\d+)?\s*(?:years?|yrs?)/i.test(parsed.detectedYearsRequired || '');
+
+    if (isStrictSenior || isSeniorYears) {
+      parsed.experienceVerdict = 'UNQUALIFIED_SENIOR';
+      parsed.isExperienceMatch = false;
+      parsed.hrExperienceNotes = `Role strictly requires ${parsed.detectedYearsRequired || 'Senior/Staff experience'}. With 1.5 yrs total experience, ATS screening will filter this out as a senior grade mismatch.`;
+      parsed.matchScore = Math.min(parsed.matchScore ?? 35, 38);
+      parsed.recommendation = 'NOT_RECOMMENDED';
+    }
+
+    return {
+      detectedYearsRequired: parsed.detectedYearsRequired ?? '0-2 years',
+      isExperienceMatch: parsed.isExperienceMatch ?? true,
+      experienceVerdict: parsed.experienceVerdict ?? (parsed.matchScore >= 75 ? 'PERFECT_FIT' : 'EXPERIENCE_GAP'),
+      hrExperienceNotes: parsed.hrExperienceNotes ?? '',
+      matchScore: parsed.matchScore ?? 50,
+      recommendation: parsed.recommendation ?? 'GOOD_MATCH',
+      matchedKeywords: parsed.matchedKeywords ?? [],
+      missingKeywords: parsed.missingKeywords ?? [],
+      jdSummary: parsed.jdSummary ?? '',
+      resumeTweaks: parsed.resumeTweaks ?? [],
+      draftCoverLetter: parsed.draftCoverLetter ?? ''
+    };
   }
 
   async answerApplicationQuestion(

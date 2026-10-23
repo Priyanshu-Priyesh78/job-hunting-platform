@@ -4,6 +4,9 @@ import { GeminiAI } from './gemini.js';
 export interface TailoredResumeResult {
   jobTitle: string;
   company: string;
+  detectedYearsRequired?: string;
+  experienceVerdict?: string;
+  hrExperienceNotes?: string;
   matchedKeywords: string[];
   missingKeywords: string[];
   tailoredSummary: string;
@@ -54,16 +57,21 @@ ${job.description.slice(0, 4000)}
 ### Instructions:
 Generate an ATS-optimized, high-impact resume enhancement specifically tailored for this job posting.
 Rules:
-1. Tailor the professional summary to directly address the company's tech stack and pain points.
-2. Select and rewrite 4-5 bullet points from Priyanshu's real Revent Labs experience to highlight the exact keywords and skills this employer cares about most (e.g. AWS vs K8s vs IaC vs Observability).
-3. Identify missing keywords that Priyanshu should weave into his interview or cover letter.
-4. Generate a tailored 120-150 word application pitch / cover letter.
-5. Generate the complete tailored Resume in clean GitHub Flavored Markdown.
+1. Detect experience required in JD (e.g. 0-2 yrs, 2-4 yrs, 3-5 yrs, 5+ yrs). If the JD demands 5+, 7+, 8+ years or has Senior/Staff/Principal/Lead in title, set experienceVerdict strictly to "UNQUALIFIED_SENIOR". If 0-2 years, set "PERFECT_FIT". If 2-4 years, set "JUSTIFIABLE_BY_SCALE" (outclassed by Priyanshu's 14+ cluster ownership). If 4-5 years, set "EXPERIENCE_GAP".
+2. Provide a 1-sentence HR recruiter screening note explaining why Priyanshu's production scale qualifies him (or flagging the senior experience mismatch).
+3. Tailor the professional summary to directly address the company's tech stack and pain points.
+4. Select and rewrite 4-5 bullet points from Priyanshu's real Revent Labs experience to highlight the exact keywords and skills this employer cares about most (e.g. AWS vs K8s vs IaC vs Observability).
+5. Identify missing keywords that Priyanshu should weave into his interview or cover letter.
+6. Generate a tailored 120-150 word application pitch / cover letter.
+7. Generate the complete tailored Resume in clean GitHub Flavored Markdown.
 
 Return ONLY a valid JSON object matching this schema:
 {
   "jobTitle": "${job.title}",
   "company": "${job.company}",
+  "detectedYearsRequired": "string (e.g. '0-2 years', '2-4 years', '3-5 years', '5+ years')",
+  "experienceVerdict": "PERFECT_FIT" | "JUSTIFIABLE_BY_SCALE" | "EXPERIENCE_GAP" | "UNQUALIFIED_SENIOR",
+  "hrExperienceNotes": "string (1-2 sentences with recruiter's exact screening rationale)",
   "matchedKeywords": ["string", "string"],
   "missingKeywords": ["string", "string"],
   "tailoredSummary": "A punchy 3-sentence summary tailored to this role",
@@ -80,12 +88,25 @@ Return ONLY a valid JSON object matching this schema:
 
     // Call Gemini using the fallback cascade
     const raw = await (this.ai as any).callWithFallback(prompt, true);
+    let parsed: any;
     try {
-      return JSON.parse(raw);
+      parsed = JSON.parse(raw);
     } catch {
       const cleaned = raw.replace(/```json/g, '').replace(/```/g, '').trim();
-      return JSON.parse(cleaned);
+      parsed = JSON.parse(cleaned);
     }
+
+    const titleLower = job.title.toLowerCase();
+    const isStrictSenior = /\b(senior|sr\.|sr|lead|staff|principal|director|head of|vp|architect)\b/i.test(titleLower) &&
+      !titleLower.includes('junior') && !titleLower.includes('associate');
+    const isSeniorYears = /\b([5-9]|1[0-5])\+?\s*(?:to|-)?\s*(\d+)?\s*(?:years?|yrs?)/i.test(parsed.detectedYearsRequired || '');
+
+    if (isStrictSenior || isSeniorYears) {
+      parsed.experienceVerdict = 'UNQUALIFIED_SENIOR';
+      parsed.hrExperienceNotes = `Role strictly demands ${parsed.detectedYearsRequired || 'Senior/Staff experience'}. Candidate's 1.5 yrs total tenure will face automatic ATS rejection for this senior band.`;
+    }
+
+    return parsed;
   }
 }
 

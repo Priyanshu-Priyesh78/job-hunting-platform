@@ -13,6 +13,9 @@ const CSV_HEADERS = [
   { id: 'company', title: 'Company' },
   { id: 'location', title: 'Location' },
   { id: 'experienceRequired', title: 'Exp Required' },
+  { id: 'detectedYearsRequired', title: 'Exp Detected' },
+  { id: 'experienceVerdict', title: 'Exp Verdict' },
+  { id: 'hrExperienceNotes', title: 'HR Notes' },
   { id: 'matchScore', title: 'Match Score %' },
   { id: 'recommendation', title: 'Recommendation' },
   { id: 'matchedKeywords', title: 'Matched Keywords' },
@@ -21,7 +24,8 @@ const CSV_HEADERS = [
   { id: 'status', title: 'Status' },
   { id: 'postedDate', title: 'Date Posted' },
   { id: 'appliedDate', title: 'Date Applied' },
-  { id: 'notes', title: 'Notes' }
+  { id: 'notes', title: 'Notes' },
+  { id: 'description', title: 'Description' }
 ];
 
 export class JobStore {
@@ -48,6 +52,9 @@ export class JobStore {
             company: data.Company || data.company || '',
             location: data.Location || data.location || '',
             experienceRequired: data['Exp Required'] || data.experienceRequired || '',
+            detectedYearsRequired: data['Exp Detected'] || data.detectedYearsRequired || '',
+            experienceVerdict: data['Exp Verdict'] || data.experienceVerdict || undefined,
+            hrExperienceNotes: data['HR Notes'] || data.hrExperienceNotes || '',
             matchScore: data['Match Score %'] ? parseInt(data['Match Score %'], 10) : undefined,
             recommendation: data.Recommendation || data.recommendation,
             matchedKeywords: data['Matched Keywords'] ? data['Matched Keywords'].split(', ') : [],
@@ -56,7 +63,8 @@ export class JobStore {
             status: data.Status || data.status || 'NEW',
             postedDate: data['Date Posted'] || data.postedDate || '',
             appliedDate: data['Date Applied'] || data.appliedDate || '',
-            notes: data.Notes || data.notes || ''
+            notes: data.Notes || data.notes || '',
+            description: data.Description || data.description || ''
           });
         })
         .on('end', () => resolve(results))
@@ -140,7 +148,10 @@ export class JobStore {
       title: j.title,
       company: j.company,
       location: j.location,
-      experienceRequired: j.experienceRequired,
+      experienceRequired: j.experienceRequired || '',
+      detectedYearsRequired: j.detectedYearsRequired || '',
+      experienceVerdict: j.experienceVerdict || '',
+      hrExperienceNotes: j.hrExperienceNotes || '',
       matchScore: j.matchScore ?? '',
       recommendation: j.recommendation ?? '',
       matchedKeywords: (j.matchedKeywords || []).join(', '),
@@ -149,7 +160,8 @@ export class JobStore {
       status: j.status || 'NEW',
       postedDate: j.postedDate || '',
       appliedDate: j.appliedDate || '',
-      notes: j.notes || ''
+      notes: j.notes || '',
+      description: (j.description || '').slice(0, 500)
     }));
 
     await csvWriter.writeRecords(records);

@@ -273,9 +273,9 @@ export class FormAutofiller {
           (await textarea.getAttribute('aria-label')) ||
           (await page.evaluate((el: any) => {
             const label = document.querySelector(`label[for="${el.id}"]`);
-            if (label) return label.innerText;
+            if (label) return (label as HTMLElement).innerText || label.textContent;
             const parent = el.closest('div, fieldset');
-            return parent ? parent.innerText : '';
+            return parent ? (parent as HTMLElement).innerText || parent.textContent : '';
           }, textarea)) ||
           '';
 

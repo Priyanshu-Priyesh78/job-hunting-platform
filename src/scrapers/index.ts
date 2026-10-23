@@ -42,6 +42,7 @@ export class ScraperManager {
 
   async runScan(options?: {
     platforms?: string[];
+    roles?: string[];
     role?: string;
     location?: string;
     timeFilter?: string;
@@ -52,36 +53,48 @@ export class ScraperManager {
       ? options.platforms
       : ['linkedin', 'naukri', 'indeed', 'wellfound', 'instahyre'];
 
-    const role = options?.role || this.config.targetRoles[0]; // e.g., 'DevOps Engineer'
+    // Determine target roles: support array of roles or fallback to config target roles
+    const targetRoles = options?.roles && options.roles.length > 0
+      ? options.roles
+      : options?.role
+      ? [options.role]
+      : this.config.targetRoles.slice(0, 4); // Default to top 4 core roles (DevOps, SRE, Cloud, Platform)
+
     const location = options?.location || 'India';
     const enableAI = options?.enableAIAnalysis ?? true;
     const timeFilter = options?.timeFilter || 'week';
 
-    console.log(`\n🚀 Starting Job Hunter Scan`);
-    console.log(`Role: ${role} | Location: ${location} | Time Filter: ${timeFilter}`);
+    console.log(`\n🚀 Starting Multi-Role Job Hunter Scan`);
+    console.log(`Roles: ${targetRoles.join(', ')}`);
+    console.log(`Location: ${location} | Time Filter: ${timeFilter}`);
     console.log(`Platforms: ${targetPlatforms.join(', ')}\n`);
 
     const allFound: JobListing[] = [];
 
-    for (const platName of targetPlatforms) {
-      const scraper = this.getScraper(platName);
-      if (!scraper) {
-        console.warn(`[Skip] Platform ${platName} not supported yet.`);
-        continue;
-      }
+    for (const role of targetRoles) {
+      console.log(`\n========================================`);
+      console.log(`🔍 Scanning for Role: "${role}"`);
+      console.log(`========================================`);
 
-      try {
-        console.log(`\n--- Scanning ${platName.toUpperCase()} ---`);
-        const jobs = await scraper.searchJobs(role, location, timeFilter);
-        console.log(`Found ${jobs.length} raw jobs on ${platName}`);
+      for (const platName of targetPlatforms) {
+        const scraper = this.getScraper(platName);
+        if (!scraper) {
+          continue;
+        }
 
-        allFound.push(...jobs);
-      } catch (err: any) {
-        console.error(`Error scanning ${platName}:`, err.message);
+        try {
+          console.log(`[${platName.toUpperCase()}] Searching for "${role}"...`);
+          const jobs = await scraper.searchJobs(role, location, timeFilter);
+          console.log(`Found ${jobs.length} jobs on ${platName} for "${role}"`);
+
+          allFound.push(...jobs);
+        } catch (err: any) {
+          console.error(`Error scanning ${platName} for ${role}:`, err.message);
+        }
       }
     }
 
-    console.log(`\nTotal jobs scraped across all platforms: ${allFound.length}`);
+    console.log(`\nTotal jobs scraped across all roles & platforms: ${allFound.length}`);
 
     // Deduplicate
     const uniqueMap = new Map<string, JobListing>();
@@ -94,22 +107,34 @@ export class ScraperManager {
     const deduplicated = Array.from(uniqueMap.values());
     console.log(`Unique jobs after deduplication: ${deduplicated.length}`);
 
-    // Keyword filtering & scoring
+    // Keyword filtering & initial experience heuristics
     for (const job of deduplicated) {
-      this.evaluateKeywords(job);
+      this.evaluateKeywordsAndSeniority(job);
     }
 
-    // Sort by preliminary matched keywords count
-    deduplicated.sort((a, b) => ((b.matchedKeywords?.length || 0) - (a.matchedKeywords?.length || 0)));
+    // Sort by:
+    // 1. Matched experience fit (PERFECT_FIT and JUSTIFIABLE_BY_SCALE first)
+    // 2. Preliminary matched keywords count
+    deduplicated.sort((a, b) => {
+      const aIsSenior = a.experienceVerdict === 'UNQUALIFIED_SENIOR' ? 1 : 0;
+      const bIsSenior = b.experienceVerdict === 'UNQUALIFIED_SENIOR' ? 1 : 0;
+      if (aIsSenior !== bIsSenior) return aIsSenior - bIsSenior; // non-seniors first
+      return ((b.matchedKeywords?.length || 0) - (a.matchedKeywords?.length || 0));
+    });
 
-    // AI Deep Analysis on top jobs
+    // AI Deep Analysis on candidate jobs with Gemini (Enterprise ATS & HR persona)
     if (enableAI && deduplicated.length > 0) {
-      const topJobs = deduplicated.slice(0, 8); // Analyze top 8 matching jobs with Gemini
-      console.log(`\n🤖 Running Gemini Deep Analysis on top ${topJobs.length} matching jobs...`);
+      // Prioritize top jobs that aren't already flagged as senior mismatch
+      const candidatesForAI = deduplicated.filter(j => j.experienceVerdict !== 'UNQUALIFIED_SENIOR').slice(0, 15);
+      // Also analyze 2 senior ones if needed to verify
+      const seniorCandidates = deduplicated.filter(j => j.experienceVerdict === 'UNQUALIFIED_SENIOR').slice(0, 2);
+      const topJobs = [...candidatesForAI, ...seniorCandidates];
+
+      console.log(`\n🤖 Running Enterprise ATS & HR Recruiter Analysis on top ${topJobs.length} jobs...`);
 
       for (let i = 0; i < topJobs.length; i++) {
         const job = topJobs[i];
-        console.log(`[${i + 1}/${topJobs.length}] Analyzing: ${job.title} at ${job.company}`);
+        console.log(`[${i + 1}/${topJobs.length}] Recruiter Audit: ${job.title} at ${job.company}`);
 
         try {
           const textToAnalyze = job.description || `${job.title} at ${job.company}. Required skills: DevOps, AWS, Kubernetes, Terraform, CI/CD, Observability, SRE. Experience: 0-2 years.`;
@@ -126,14 +151,21 @@ export class ScraperManager {
 
           job.matchScore = analysis.matchScore;
           job.recommendation = analysis.recommendation;
+          job.detectedYearsRequired = analysis.detectedYearsRequired;
+          job.isExperienceMatch = analysis.isExperienceMatch;
+          job.experienceVerdict = analysis.experienceVerdict;
+          job.hrExperienceNotes = analysis.hrExperienceNotes;
           job.matchedKeywords = Array.from(new Set([...(job.matchedKeywords || []), ...analysis.matchedKeywords]));
           job.missingKeywords = analysis.missingKeywords;
           job.analysisSummary = analysis.jdSummary;
           job.notes = analysis.resumeTweaks.join(' | ');
 
-          console.log(`   -> Match Score: ${job.matchScore}% | ${job.recommendation}`);
+          console.log(`   -> Verdict: ${job.experienceVerdict} (${job.detectedYearsRequired}) | Score: ${job.matchScore}%`);
+          if (job.hrExperienceNotes) {
+            console.log(`   -> HR Note: ${job.hrExperienceNotes}`);
+          }
         } catch (err: any) {
-          console.warn(`   -> Gemini analysis note: ${err.message}`);
+          console.warn(`   -> Recruiter analysis notice: ${err.message}`);
         }
       }
     }
@@ -141,13 +173,47 @@ export class ScraperManager {
     return deduplicated;
   }
 
-  private evaluateKeywords(job: JobListing): void {
+  private evaluateKeywordsAndSeniority(job: JobListing): void {
+    const titleLower = job.title.toLowerCase();
     const text = `${job.title} ${job.company} ${job.description || ''}`.toLowerCase();
     const matched: string[] = [];
     const missing: string[] = [];
 
+    // Check for strict senior / lead / staff titles
+    const isSeniorTitle = /\b(senior|sr\.|sr|lead|staff|principal|director|head of|vp|architect)\b/i.test(titleLower) &&
+      !titleLower.includes('junior') && !titleLower.includes('associate');
+
+    // Check for high experience mentions in text (5+ to 12+ years)
+    const highExpMatch = text.match(/\b([5-9]|1[0-5])\+?\s*(?:to|-)\s*(\d+)?\s*(?:years?|yrs?)/i) ||
+      text.match(/\b([5-9]|1[0-5])\+?\s*(?:years?|yrs?)\s*(?:of\s*)?(?:experience|exp)/i);
+
+    if (isSeniorTitle || highExpMatch) {
+      job.detectedYearsRequired = highExpMatch ? highExpMatch[0] : '5+ years (Senior Level)';
+      job.experienceVerdict = 'UNQUALIFIED_SENIOR';
+      job.isExperienceMatch = false;
+      job.hrExperienceNotes = 'Role specifies Senior/Lead/Staff level demanding 5+ years of experience. Flagged as experience mismatch.';
+      job.matchScore = 35;
+      job.recommendation = 'NOT_RECOMMENDED';
+    } else {
+      // Check for junior / 0-3 years mentions
+      const juniorMatch = text.match(/\b(0|1|2|3)\s*(?:to|-)\s*(2|3|4)\s*(?:years?|yrs?)/i) ||
+        text.match(/\b(0|1|2)\+?\s*(?:years?|yrs?)/i) ||
+        titleLower.includes('junior') || titleLower.includes('associate') || titleLower.includes('entry');
+
+      if (juniorMatch) {
+        job.detectedYearsRequired = typeof juniorMatch === 'object' && juniorMatch[0] ? juniorMatch[0] : '0-2 years';
+        job.experienceVerdict = 'PERFECT_FIT';
+        job.isExperienceMatch = true;
+        job.hrExperienceNotes = 'Matches 0-2 years junior/associate requirements. Priyanshu is strongly competitive.';
+      } else {
+        job.detectedYearsRequired = '1-3 years (Mid/Associate)';
+        job.experienceVerdict = 'JUSTIFIABLE_BY_SCALE';
+        job.isExperienceMatch = true;
+        job.hrExperienceNotes = 'Justifiable by Priyanshu\'s 14+ production EKS clusters across 7 AWS regions.';
+      }
+    }
+
     for (const kw of this.config.keywords) {
-      // Normalize keyword (remove parentheses content for simple text matching)
       const cleanKw = kw.toLowerCase().replace(/\([^)]*\)/g, '').trim();
       if (cleanKw.length > 2 && text.includes(cleanKw)) {
         matched.push(kw);
@@ -157,9 +223,8 @@ export class ScraperManager {
     job.matchedKeywords = matched;
     job.missingKeywords = missing;
 
-    if (!job.matchScore) {
-      // Simple initial score based on keyword density
-      const score = Math.min(95, Math.round(50 + (matched.length / 5) * 20));
+    if (!job.matchScore && job.experienceVerdict !== 'UNQUALIFIED_SENIOR') {
+      const score = Math.min(95, Math.round(55 + (matched.length / 5) * 18));
       job.matchScore = score;
       job.recommendation = score >= 80 ? 'HIGHLY_RECOMMENDED' : score >= 65 ? 'GOOD_MATCH' : 'WEAK_MATCH';
     }
