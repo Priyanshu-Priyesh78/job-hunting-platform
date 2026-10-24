@@ -3,276 +3,329 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JobHunter AI — Priyanshu Priyesh (DevOps / SRE)</title>
+  <title>JobHunter AI — Platform Engineering & SRE Hub</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
           colors: {
-            brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
-            surface: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81'
+            }
           }
         }
       }
     }
   </script>
   <style>
-    body { background-color: #0b0f19; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; }
-    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-    .glass-card { background: #131d2f; border: 1px solid #1e293b; }
-    .glass-card:hover { border-color: #3b82f6; }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     .section-header { cursor: pointer; user-select: none; }
-    .transition-max-height { transition: max-height 0.3s ease-in-out; }
+    .card-hover {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-hover:hover {
+      border-color: #93c5fd;
+      box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+      transform: translateY(-1px);
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
 
-  <!-- TOP NAVBAR -->
-  <header class="glass sticky top-0 z-40 border-b border-slate-800 px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center space-x-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-        <i data-lucide="zap" class="w-6 h-6 text-white"></i>
+  <!-- TOP APP NAVBAR -->
+  <header class="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 shadow-sm px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center space-x-3.5">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-600 flex items-center justify-center shadow-md shadow-indigo-600/20 text-white">
+        <i data-lucide="zap" class="w-5 h-5"></i>
       </div>
       <div>
-        <h1 class="text-lg font-bold text-white flex items-center gap-2">
-          JobHunter AI
-          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">DevOps / SRE</span>
-        </h1>
-        <p class="text-xs text-slate-400">Priyanshu Priyesh • LNCT 2025 • Revent Labs SRE</p>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base font-bold text-slate-900 tracking-tight">JobHunter AI</h1>
+          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+            Platform Eng & SRE
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 font-medium">Priyanshu Priyesh • Revent Labs (14+ Clusters) • LNCT Bhopal 2025</p>
       </div>
     </div>
 
-    <!-- ACTION BUTTONS -->
-    <div class="flex items-center space-x-3">
-      <button onclick="openAutofillModal()" class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-sm font-semibold transition shadow-sm">
-        <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+    <!-- ACTION BUTTONS TOOLBAR -->
+    <div class="flex items-center space-x-2.5">
+      <!-- 1-Click Autofill -->
+      <button onclick="openAutofillModal()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs font-semibold transition shadow-xs">
+        <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-600"></i>
         <span>1-Click Autofill</span>
       </button>
 
-      <button onclick="openSheetsModal()" class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm font-medium border border-slate-700 transition">
-        <i data-lucide="table" class="w-4 h-4 text-emerald-400"></i>
-        <span>Google Sheets</span>
-        <span id="sheetsStatusDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+      <!-- Platform Credentials & Cookies -->
+      <button onclick="openCredentialsModal()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-medium transition shadow-xs">
+        <i data-lucide="key" class="w-3.5 h-3.5 text-slate-600"></i>
+        <span>Credentials & Cookies</span>
       </button>
 
-      <button onclick="openScanModal()" class="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-sm font-semibold text-white shadow-lg shadow-indigo-600/30 transition">
-        <i data-lucide="compass" class="w-4 h-4"></i>
+      <!-- Google Sheets Sync -->
+      <button onclick="openSheetsModal()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-medium transition shadow-xs">
+        <i data-lucide="table" class="w-3.5 h-3.5 text-emerald-600"></i>
+        <span>Google Sheets</span>
+        <span id="sheetsStatusDot" class="w-2 h-2 rounded-full bg-emerald-500 ml-0.5"></span>
+      </button>
+
+      <!-- Run Scanner Trigger -->
+      <button onclick="openScanModal()" class="flex items-center space-x-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm shadow-indigo-600/30 transition">
+        <i data-lucide="compass" class="w-3.5 h-3.5"></i>
         <span>Run Scanner</span>
       </button>
 
-      <button onclick="fetchJobs()" title="Refresh" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+      <!-- Refresh Button -->
+      <button onclick="fetchJobs()" title="Refresh Database" class="p-2 rounded-lg bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 transition shadow-xs">
         <i data-lucide="rotate-cw" class="w-4 h-4"></i>
       </button>
     </div>
   </header>
 
-  <!-- LIVE SCANNING TIMELINE & PROGRESS BAR -->
-  <div id="scanningBanner" class="hidden bg-slate-900/90 border-b border-blue-500/30 px-6 py-4 space-y-3">
-    <div class="flex items-center justify-between text-sm">
+  <!-- LIVE SCANNING TIMELINE & PROGRESS BANNER -->
+  <div id="scanningBanner" class="hidden bg-indigo-50 border-b border-indigo-200 px-6 py-4 space-y-3">
+    <div class="flex items-center justify-between text-xs">
       <div class="flex items-center space-x-3">
         <span class="relative flex h-3 w-3">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-600"></span>
         </span>
-        <span id="scanStatusStage" class="font-bold text-white text-sm">Initializing Scanners...</span>
-        <span id="scanStatusDetail" class="text-xs text-slate-400">Scanning job boards in background...</span>
+        <span id="scanStatusStage" class="font-bold text-indigo-950 text-sm">Initializing Scanners...</span>
+        <span id="scanStatusDetail" class="text-xs text-indigo-700">Connecting to job portals in background...</span>
       </div>
-      <span id="scanPercentBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">0%</span>
+      <span id="scanPercentBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-300">0%</span>
     </div>
 
     <!-- Progress Bar -->
-    <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-      <div id="scanProgressBar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+    <div class="w-full bg-indigo-100 rounded-full h-2 overflow-hidden border border-indigo-200">
+      <div id="scanProgressBar" class="bg-gradient-to-r from-indigo-600 to-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
     </div>
 
     <!-- Timeline Steps -->
-    <div class="grid grid-cols-5 gap-2 text-[11px] font-medium text-center text-slate-400 pt-1">
-      <div id="stepInit" class="text-blue-400 font-semibold">1. Initialize</div>
-      <div id="stepScrape" class="text-slate-500">2. Scrape Boards</div>
-      <div id="stepFilter" class="text-slate-500">3. Match Keywords</div>
-      <div id="stepAi" class="text-slate-500">4. Gemini Scoring</div>
-      <div id="stepSync" class="text-slate-500">5. Sync Sheet</div>
+    <div class="grid grid-cols-5 gap-2 text-[11px] font-medium text-center text-slate-500 pt-1">
+      <div id="stepInit" class="text-indigo-700 font-bold">1. Initialize</div>
+      <div id="stepScrape" class="text-slate-400">2. Scrape Portals</div>
+      <div id="stepFilter" class="text-slate-400">3. Match Keywords</div>
+      <div id="stepAi" class="text-slate-400">4. Gemini HR Audit</div>
+      <div id="stepSync" class="text-slate-400">5. Sheets Sync</div>
     </div>
   </div>
 
   <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 space-y-6">
 
-    <!-- STATS OVERVIEW -->
+    <!-- METRICS OVERVIEW (Clean Light Cards) -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="glass-card p-5 rounded-2xl">
-        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-          <span>Total Tracked</span>
-          <i data-lucide="briefcase" class="w-4 h-4 text-blue-400"></i>
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
+          <span>Total Pipeline</span>
+          <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <i data-lucide="briefcase" class="w-3.5 h-3.5"></i>
+          </div>
         </div>
-        <div id="statTotal" class="text-3xl font-extrabold text-white">0</div>
-        <div class="text-xs text-slate-400 mt-1">across all job boards</div>
+        <div id="statTotal" class="text-2xl font-bold text-slate-900">0</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">Across all scanned platforms</div>
       </div>
 
-      <div class="glass-card p-5 rounded-2xl border-l-4 border-l-emerald-500">
-        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-          <span>Highly Recommended</span>
-          <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+      <div class="bg-white p-4 rounded-xl border border-slate-200 border-l-4 border-l-emerald-500 shadow-xs">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
+          <span>Qualified (0-3 Yrs)</span>
+          <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          </div>
         </div>
-        <div id="statHighMatch" class="text-3xl font-extrabold text-emerald-400">0</div>
-        <div class="text-xs text-slate-400 mt-1">≥ 80% match score</div>
+        <div id="statHighMatch" class="text-2xl font-bold text-emerald-600">0</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">Ideal fit & scale justified</div>
       </div>
 
-      <div class="glass-card p-5 rounded-2xl border-l-4 border-l-indigo-500">
-        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-          <span>Applications Submitted</span>
-          <i data-lucide="send" class="w-4 h-4 text-indigo-400"></i>
+      <div class="bg-white p-4 rounded-xl border border-slate-200 border-l-4 border-l-indigo-500 shadow-xs">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
+          <span>Submitted</span>
+          <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          </div>
         </div>
-        <div id="statApplied" class="text-3xl font-extrabold text-indigo-400">0</div>
-        <div class="text-xs text-slate-400 mt-1">marked applied</div>
+        <div id="statApplied" class="text-2xl font-bold text-indigo-600">0</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">Tracked applications</div>
       </div>
 
-      <div class="glass-card p-5 rounded-2xl border-l-4 border-l-amber-500">
-        <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
+      <div class="bg-white p-4 rounded-xl border border-slate-200 border-l-4 border-l-amber-500 shadow-xs">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
           <span>Interviews</span>
-          <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i>
+          <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+          </div>
         </div>
-        <div id="statInterview" class="text-3xl font-extrabold text-amber-400">0</div>
-        <div class="text-xs text-slate-400 mt-1">pipeline active</div>
+        <div id="statInterview" class="text-2xl font-bold text-amber-600">0</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">Active interview rounds</div>
       </div>
     </div>
 
-    <!-- FILTER & SEARCH BAR -->
-    <div class="glass p-4 rounded-2xl flex flex-wrap gap-3 items-center justify-between border border-slate-800">
-      <div class="flex items-center space-x-3 flex-1 min-w-[260px]">
+    <!-- UNIFIED SEARCH & FILTER TOOLBAR -->
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-wrap gap-3 items-center justify-between">
+      <!-- Search Box -->
+      <div class="flex items-center space-x-2 flex-1 min-w-[260px]">
         <div class="relative w-full">
-          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-          <input type="text" id="searchInput" oninput="renderCategorizedJobs()" placeholder="Search title, company, skills, or location..."
-            class="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+          <input type="text" id="searchInput" oninput="renderCategorizedJobs()" placeholder="Search title, company, skills, or city..."
+            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition">
         </div>
       </div>
 
+      <!-- Filters Group -->
       <div class="flex flex-wrap items-center gap-2">
-        <!-- EXPERIENCE FILTER -->
-        <select id="experienceFilter" onchange="renderCategorizedJobs()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none font-medium">
-          <option value="ALL">All Experience Levels</option>
+        <!-- Experience Filter (Default to Qualified 0-3 Yrs) -->
+        <select id="experienceFilter" onchange="renderCategorizedJobs()" 
+          class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:bg-white focus:border-indigo-500 cursor-pointer">
           <option value="QUALIFIED" selected>🎯 0-3 Yrs (Ideal & Scale Justified)</option>
-          <option value="PERFECT_FIT">🟢 0-2 Yrs (Ideal Fit Only)</option>
+          <option value="PERFECT_FIT">🟢 0-2 Yrs (Perfect Match Only)</option>
           <option value="NO_SENIORS">🚫 Exclude 5+ Yrs (No Senior/Staff)</option>
+          <option value="ALL">All Experience Levels</option>
         </select>
 
-        <!-- ROLE FILTER -->
-        <select id="roleCategoryFilter" onchange="renderCategorizedJobs()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none font-medium">
+        <!-- Role Category Filter -->
+        <select id="roleCategoryFilter" onchange="renderCategorizedJobs()" 
+          class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:bg-white focus:border-indigo-500 cursor-pointer">
           <option value="ALL">All Roles</option>
           <option value="sre">SRE / Reliability</option>
-          <option value="devops">DevOps</option>
+          <option value="devops">DevOps Engineer</option>
           <option value="cloud">Cloud Engineer</option>
           <option value="platform">Platform Engineer</option>
           <option value="kubernetes">Kubernetes / Containers</option>
         </select>
 
-        <!-- PLATFORM SELECT -->
-        <select id="platformFilter" onchange="renderCategorizedJobs()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none font-medium">
+        <!-- Platform Filter -->
+        <select id="platformFilter" onchange="renderCategorizedJobs()" 
+          class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none focus:bg-white focus:border-indigo-500 cursor-pointer">
           <option value="ALL">All Platforms</option>
           <option value="linkedin">LinkedIn</option>
+          <option value="instahyre">Instahyre (Verified)</option>
+          <option value="simplify">Simplify (New Grad)</option>
+          <option value="uplers">Uplers (Remote)</option>
+          <option value="wellfound">Wellfound (Startups)</option>
           <option value="naukri">Naukri</option>
           <option value="indeed">Indeed</option>
-          <option value="wellfound">Wellfound</option>
-          <option value="instahyre">Instahyre</option>
         </select>
       </div>
     </div>
 
-    <!-- COLLAPSIBLE CATEGORIZED SECTIONS -->
-    <div class="space-y-6">
+    <!-- COLLAPSIBLE WORKFLOW PIPELINE SECTIONS -->
+    <div class="space-y-5">
 
-      <!-- 1. NEW OPPORTUNITIES (Default Expanded) -->
-      <div class="rounded-2xl border border-slate-800 bg-slate-950/40 overflow-hidden">
-        <div onclick="toggleSection('secNew')" class="section-header p-4 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between hover:bg-slate-800/60 transition">
-          <div class="flex items-center space-x-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+      <!-- 1. NEW OPPORTUNITIES (Expanded by default) -->
+      <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+        <div onclick="toggleSection('secNew')" class="section-header p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between hover:bg-slate-100/70 transition">
+          <div class="flex items-center space-x-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
               🆕 New Opportunities
-              <span id="badgeNewCount" class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold">0</span>
+              <span id="badgeNewCount" class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold">0</span>
             </h2>
-            <span class="text-xs text-slate-500 font-normal">Unreviewed fresh openings matching 0-2 yrs</span>
+            <span class="text-xs text-slate-500 font-normal hidden sm:inline">• Unreviewed openings matching 0–3 yrs</span>
           </div>
-          <i id="iconSecNew" data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform"></i>
+          <i id="iconSecNew" data-lucide="chevron-down" class="w-4 h-4 text-slate-500 transition-transform"></i>
         </div>
         <div id="secNew" class="p-4 space-y-3">
-          <div class="text-center py-6 text-slate-500 text-xs">No new opportunities yet. Click "Run Scanner"!</div>
+          <div class="text-center py-8 text-slate-400 text-xs">No jobs found matching filters. Click "Run Scanner" to fetch fresh roles!</div>
         </div>
       </div>
 
       <!-- 2. IN REVIEW / SHORTLISTED -->
-      <div class="rounded-2xl border border-slate-800 bg-slate-950/40 overflow-hidden">
-        <div onclick="toggleSection('secReviewed')" class="section-header p-4 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between hover:bg-slate-800/60 transition">
-          <div class="flex items-center space-x-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
-            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+      <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+        <div onclick="toggleSection('secReviewed')" class="section-header p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between hover:bg-slate-100/70 transition">
+          <div class="flex items-center space-x-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
+            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
               🔍 In Review / Shortlisted
-              <span id="badgeReviewedCount" class="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-bold">0</span>
+              <span id="badgeReviewedCount" class="text-xs px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700 font-bold">0</span>
             </h2>
-            <span class="text-xs text-slate-500 font-normal">Jobs you have vetted and are preparing to apply</span>
+            <span class="text-xs text-slate-500 font-normal hidden sm:inline">• Roles you have vetted and are preparing to apply</span>
           </div>
-          <i id="iconSecReviewed" data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform"></i>
+          <i id="iconSecReviewed" data-lucide="chevron-down" class="w-4 h-4 text-slate-500 transition-transform"></i>
         </div>
         <div id="secReviewed" class="p-4 space-y-3">
-          <div class="text-center py-6 text-slate-500 text-xs">No jobs in review. Mark a job as "Reviewed" to move it here.</div>
+          <div class="text-center py-6 text-slate-400 text-xs">No jobs in review. Select "Status: Review" on any job to shortlist it here.</div>
         </div>
       </div>
 
       <!-- 3. APPLIED -->
-      <div class="rounded-2xl border border-slate-800 bg-slate-950/40 overflow-hidden">
-        <div onclick="toggleSection('secApplied')" class="section-header p-4 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between hover:bg-slate-800/60 transition">
-          <div class="flex items-center space-x-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
-            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+      <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+        <div onclick="toggleSection('secApplied')" class="section-header p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between hover:bg-slate-100/70 transition">
+          <div class="flex items-center space-x-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
               🚀 Applied Applications
-              <span id="badgeAppliedCount" class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold">0</span>
+              <span id="badgeAppliedCount" class="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-bold">0</span>
             </h2>
-            <span class="text-xs text-slate-500 font-normal">Submitted applications with custom resume tracked</span>
+            <span class="text-xs text-slate-500 font-normal hidden sm:inline">• Submitted applications with tailored resume</span>
           </div>
-          <i id="iconSecApplied" data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform"></i>
+          <i id="iconSecApplied" data-lucide="chevron-down" class="w-4 h-4 text-slate-500 transition-transform"></i>
         </div>
         <div id="secApplied" class="p-4 space-y-3">
-          <div class="text-center py-6 text-slate-500 text-xs">No applications submitted yet.</div>
+          <div class="text-center py-6 text-slate-400 text-xs">No submitted applications tracked yet.</div>
         </div>
       </div>
 
       <!-- 4. INTERVIEWS / OFFERS -->
-      <div class="rounded-2xl border border-amber-900/40 bg-slate-950/40 overflow-hidden">
-        <div onclick="toggleSection('secInterview')" class="section-header p-4 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between hover:bg-slate-800/60 transition">
-          <div class="flex items-center space-x-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+      <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+        <div onclick="toggleSection('secInterview')" class="section-header p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between hover:bg-slate-100/70 transition">
+          <div class="flex items-center space-x-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
               🎉 Interviews & Callbacks
-              <span id="badgeInterviewCount" class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold">0</span>
+              <span id="badgeInterviewCount" class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold">0</span>
             </h2>
-            <span class="text-xs text-slate-500 font-normal">Active interview rounds and discussions</span>
+            <span class="text-xs text-slate-500 font-normal hidden sm:inline">• Active interview rounds and technical discussions</span>
           </div>
-          <i id="iconSecInterview" data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform"></i>
+          <i id="iconSecInterview" data-lucide="chevron-down" class="w-4 h-4 text-slate-500 transition-transform"></i>
         </div>
         <div id="secInterview" class="p-4 space-y-3">
-          <div class="text-center py-6 text-slate-500 text-xs">No active interview calls yet. Keep applying!</div>
+          <div class="text-center py-6 text-slate-400 text-xs">No active interview calls yet.</div>
         </div>
       </div>
 
-      <!-- 5. NOT INTERESTED / REJECTED (Collapsed by default) -->
-      <div class="rounded-2xl border border-slate-800 bg-slate-950/40 overflow-hidden">
-        <div onclick="toggleSection('secRejected')" class="section-header p-4 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between hover:bg-slate-800/60 transition">
-          <div class="flex items-center space-x-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
-            <h2 class="text-sm font-bold text-slate-400 flex items-center gap-2">
-              🚫 Not Interested / Rejected
-              <span id="badgeRejectedCount" class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-bold">0</span>
+      <!-- 5. NOT INTERESTED / SENIOR SKIP (Collapsed by default) -->
+      <div class="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+        <div onclick="toggleSection('secRejected')" class="section-header p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between hover:bg-slate-100/70 transition">
+          <div class="flex items-center space-x-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+            <h2 class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
+              🚫 Excluded Senior / Not Interested
+              <span id="badgeRejectedCount" class="text-xs px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 font-bold">0</span>
             </h2>
+            <span class="text-xs text-slate-400 font-normal hidden sm:inline">• Automatically filtered 5+ yrs roles and dismissed jobs</span>
           </div>
-          <i id="iconSecRejected" data-lucide="chevron-right" class="w-4 h-4 text-slate-400 transition-transform"></i>
+          <i id="iconSecRejected" data-lucide="chevron-right" class="w-4 h-4 text-slate-500 transition-transform"></i>
         </div>
         <div id="secRejected" class="p-4 space-y-3 hidden">
-          <div class="text-center py-6 text-slate-500 text-xs">No archived jobs.</div>
+          <div class="text-center py-6 text-slate-400 text-xs">No archived jobs.</div>
         </div>
       </div>
 
@@ -280,418 +333,382 @@
 
   </main>
 
-  <!-- MODAL: RUN SCAN -->
-  <div id="scanModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <i data-lucide="compass" class="w-5 h-5 text-blue-500"></i>
-          Trigger New Job Scan
+  <!-- MODAL: RUN SCANNER -->
+  <div id="scanModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="compass" class="w-5 h-5 text-indigo-600"></i>
+          Trigger Multi-Role Scanner
         </h3>
-        <button onclick="closeScanModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button onclick="closeScanModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <div class="space-y-4 text-sm">
+      <div class="space-y-4 text-xs">
+        <!-- Roles Checkboxes -->
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <label class="text-xs font-semibold text-slate-300">Target Roles to Scrape (Multi-Role)</label>
+            <label class="font-bold text-slate-700">Target Roles to Scrape (Multi-Select)</label>
             <div class="space-x-2 text-[11px]">
-              <button type="button" onclick="toggleAllRoles(true)" class="text-blue-400 hover:underline">Select All</button>
-              <span class="text-slate-600">|</span>
-              <button type="button" onclick="toggleAllRoles(false)" class="text-slate-400 hover:underline">Clear</button>
+              <button type="button" onclick="toggleAllRoles(true)" class="text-indigo-600 font-semibold hover:underline">Select All</button>
+              <span class="text-slate-300">|</span>
+              <button type="button" onclick="toggleAllRoles(false)" class="text-slate-500 hover:underline">Clear</button>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs mb-2">
-            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" name="scan_role" value="DevOps Engineer" checked class="rounded text-blue-600">
-              <span class="font-medium text-slate-200">DevOps Engineer</span>
+            <label class="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="Site Reliability Engineer" checked class="rounded text-indigo-600">
+              <span class="font-medium text-slate-800">SRE / Reliability</span>
             </label>
-            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" name="scan_role" value="Site Reliability Engineer" checked class="rounded text-blue-600">
-              <span class="font-medium text-slate-200">SRE / Reliability</span>
+            <label class="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="DevOps Engineer" checked class="rounded text-indigo-600">
+              <span class="font-medium text-slate-800">DevOps Engineer</span>
             </label>
-            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" name="scan_role" value="Cloud Engineer" checked class="rounded text-blue-600">
-              <span class="font-medium text-slate-200">Cloud Engineer</span>
+            <label class="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="Cloud Engineer" checked class="rounded text-indigo-600">
+              <span class="font-medium text-slate-800">Cloud Engineer</span>
             </label>
-            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" name="scan_role" value="Platform Engineer" checked class="rounded text-blue-600">
-              <span class="font-medium text-slate-200">Platform Engineer</span>
+            <label class="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="Platform Engineer" checked class="rounded text-indigo-600">
+              <span class="font-medium text-slate-800">Platform Engineer</span>
             </label>
-            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" name="scan_role" value="Infrastructure Engineer" class="rounded text-blue-600">
-              <span class="font-medium text-slate-200">Infrastructure Eng</span>
+            <label class="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="Infrastructure Engineer" class="rounded text-indigo-600">
+              <span class="font-medium text-slate-800">Infrastructure Eng</span>
             </label>
-            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" name="scan_role" value="Kubernetes Engineer" class="rounded text-blue-600">
-              <span class="font-medium text-slate-200">Kubernetes Engineer</span>
+            <label class="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" name="scan_role" value="Kubernetes Engineer" class="rounded text-indigo-600">
+              <span class="font-medium text-slate-800">Kubernetes Engineer</span>
             </label>
           </div>
-          <input type="text" id="scanCustomRoleInput" placeholder="Or enter specific custom role (optional)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500">
+          <input type="text" id="scanCustomRoleInput" placeholder="Or enter specific custom role (optional)..." 
+            class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500">
         </div>
 
+        <!-- Location -->
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Location</label>
-          <input type="text" id="scanLocationInput" value="India" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          <label class="block font-bold text-slate-700 mb-1">Target Location</label>
+          <input type="text" id="scanLocationInput" value="India" 
+            class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-indigo-500">
         </div>
 
+        <!-- Time Filter -->
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Posted Time Filter</label>
-          <select id="scanTimeFilter" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white">
-            <option value="6h" selected>Past 6 Hours (Fresh Openings)</option>
+          <label class="block font-bold text-slate-700 mb-1">Posted Time Window</label>
+          <select id="scanTimeFilter" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-indigo-500">
+            <option value="6h">Past 6 Hours (Fresh Openings)</option>
             <option value="24h">Past 24 Hours</option>
-            <option value="week">Past Week (7 Days)</option>
+            <option value="week" selected>Past Week (Recommended - 7 Days)</option>
           </select>
-          <p class="text-xs text-slate-500 mt-1">Deduplication prevents re-adding jobs you have already tracked.</p>
         </div>
 
+        <!-- Platforms -->
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Platforms</label>
+          <label class="block font-bold text-slate-700 mb-1">Platforms to Scrape</label>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" id="plat_linkedin" checked class="rounded text-blue-600">
-              <span>LinkedIn</span>
+            <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" id="plat_linkedin" checked class="rounded text-indigo-600">
+              <span class="font-medium">LinkedIn</span>
             </label>
-            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" id="plat_naukri" checked class="rounded text-blue-600">
-              <span>Naukri</span>
+            <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" id="plat_instahyre" checked class="rounded text-indigo-600">
+              <span class="font-medium">Instahyre (0-2 Yrs API)</span>
             </label>
-            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" id="plat_indeed" checked class="rounded text-blue-600">
-              <span>Indeed</span>
+            <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" id="plat_simplify" checked class="rounded text-indigo-600">
+              <span class="font-medium">Simplify (New Grad)</span>
             </label>
-            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" id="plat_wellfound" checked class="rounded text-blue-600">
-              <span>Wellfound (Startups)</span>
+            <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" id="plat_uplers" checked class="rounded text-indigo-600">
+              <span class="font-medium">Uplers (Remote)</span>
             </label>
-            <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer">
-              <input type="checkbox" id="plat_instahyre" checked class="rounded text-blue-600">
-              <span>Instahyre</span>
+            <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" id="plat_wellfound" checked class="rounded text-indigo-600">
+              <span class="font-medium">Wellfound (Startups)</span>
+            </label>
+            <label class="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer">
+              <input type="checkbox" id="plat_naukri" checked class="rounded text-indigo-600">
+              <span class="font-medium">Naukri</span>
             </label>
           </div>
         </div>
 
-        <div class="flex items-center space-x-2">
-          <input type="checkbox" id="scanEnableAI" checked class="rounded text-blue-600">
-          <label for="scanEnableAI" class="text-xs text-slate-300">Run Gemini Deep Analysis & Match Scoring on top results</label>
+        <div class="flex items-center space-x-2 pt-1">
+          <input type="checkbox" id="scanEnableAI" checked class="rounded text-indigo-600">
+          <label for="scanEnableAI" class="text-xs text-slate-700 font-medium">Personally audit live page HTML with Gemini ATS Engine</label>
         </div>
       </div>
 
-      <div class="flex justify-end space-x-3 pt-3 border-t border-slate-800">
-        <button onclick="closeScanModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm">Cancel</button>
-        <button onclick="triggerScan()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30">
+      <div class="flex justify-end space-x-2.5 pt-3 border-t border-slate-100">
+        <button onclick="closeScanModal()" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">Cancel</button>
+        <button onclick="triggerScan()" class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-md shadow-indigo-600/30">
           Start Scanning
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: RESUME CUSTOMIZER & NETWORKING (Comprehensive) -->
-  <div id="resumeModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 w-full max-w-4xl rounded-2xl p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div>
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-400"></i>
-            Interactive Resume Editor & Networking Lead Finder
-          </h3>
-          <p id="resumeModalJobInfo" class="text-xs text-slate-400 mt-0.5">Role at Company</p>
-        </div>
-        <button onclick="closeResumeModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+  <!-- MODAL: PLATFORM CREDENTIALS & COOKIES -->
+  <div id="credentialsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 w-full max-w-xl rounded-2xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scroll">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="key" class="w-5 h-5 text-indigo-600"></i>
+          Platform Authentication & Session Cookies
+        </h3>
+        <button onclick="closeCredentialsModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <!-- TABS: 1. RESUME EDITOR | 2. COVER LETTER | 3. NETWORKING & LEADS -->
-      <div class="flex border-b border-slate-800 space-x-4 text-xs font-semibold">
-        <button onclick="switchResumeTab('editor')" id="tabBtnEditor" class="pb-2.5 text-blue-400 border-b-2 border-blue-500 flex items-center gap-1.5 font-bold">
+      <p class="text-xs text-slate-500">
+        Add your login email/password or session cookies to enable personalized candidate matching and bypass guest rate limits. Credentials are stored locally in <code class="bg-slate-100 px-1 py-0.5 rounded text-indigo-600 font-mono">config/credentials.json</code> and never shared.
+      </p>
+
+      <div class="space-y-4 text-xs">
+        <!-- 1. LinkedIn -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between font-bold text-slate-800">
+            <span class="flex items-center gap-1.5"><i data-lucide="linkedin" class="w-4 h-4 text-blue-600"></i> LinkedIn Session</span>
+            <span class="text-[10px] text-slate-500 font-normal">Optional: li_at cookie</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="cred_li_cookie" placeholder="Paste li_at session cookie..." class="col-span-2 w-full bg-white border border-slate-300 rounded-lg p-2 text-xs">
+          </div>
+        </div>
+
+        <!-- 2. Wellfound -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between font-bold text-slate-800">
+            <span class="flex items-center gap-1.5"><i data-lucide="rocket" class="w-4 h-4 text-red-500"></i> Wellfound (AngelList)</span>
+            <span class="text-[10px] text-slate-500 font-normal">Session Cookie</span>
+          </div>
+          <input type="text" id="cred_wf_cookie" placeholder="Paste _wellfound_session cookie..." class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs">
+        </div>
+
+        <!-- 3. Uplers -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between font-bold text-slate-800">
+            <span class="flex items-center gap-1.5"><i data-lucide="globe" class="w-4 h-4 text-emerald-600"></i> Uplers Talent Portal</span>
+            <span class="text-[10px] text-slate-500 font-normal">Talent Credentials</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="email" id="cred_uplers_email" placeholder="Uplers Email..." class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs">
+            <input type="password" id="cred_uplers_pass" placeholder="Uplers Password..." class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs">
+          </div>
+        </div>
+
+        <!-- 4. Simplify -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between font-bold text-slate-800">
+            <span class="flex items-center gap-1.5"><i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i> Simplify Jobs</span>
+            <span class="text-[10px] text-emerald-600 font-semibold">Active & Live Database</span>
+          </div>
+          <input type="text" id="cred_simplify_token" placeholder="Optional Simplify User / Session Token..." class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs">
+        </div>
+
+        <!-- 5. Instahyre -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between font-bold text-slate-800">
+            <span class="flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4 text-blue-500"></i> Instahyre</span>
+            <span class="text-[10px] text-emerald-600 font-semibold">Direct API Connected (0-2 Yrs)</span>
+          </div>
+          <input type="text" id="cred_instahyre_email" placeholder="Optional Instahyre Account Email..." class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs">
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-3 border-t border-slate-100">
+        <span id="credSaveMsg" class="text-xs font-semibold text-emerald-600"></span>
+        <div class="flex space-x-2">
+          <button onclick="closeCredentialsModal()" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">Close</button>
+          <button onclick="savePlatformCredentials()" class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-md shadow-indigo-600/20">Save Credentials</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RESUME CUSTOMIZER, LIVE EDITOR & NETWORKING -->
+  <div id="resumeModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 w-full max-w-4xl rounded-2xl p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-600"></i>
+            Interactive Resume Customizer & Networking Leads
+          </h3>
+          <p id="resumeModalJobInfo" class="text-xs text-slate-500 mt-0.5 font-medium">Role at Company</p>
+        </div>
+        <button onclick="closeResumeModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <!-- TABS -->
+      <div class="flex border-b border-slate-200 space-x-4 text-xs font-semibold">
+        <button onclick="switchResumeTab('editor')" id="tabBtnEditor" class="pb-2.5 text-indigo-600 border-b-2 border-indigo-600 flex items-center gap-1.5 font-bold">
           <i data-lucide="file-text" class="w-4 h-4"></i> Tailor Resume & Generate PDF
         </button>
-        <button onclick="switchResumeTab('coverletter')" id="tabBtnCoverLetter" class="pb-2.5 text-slate-400 hover:text-white flex items-center gap-1.5 transition">
+        <button onclick="switchResumeTab('coverletter')" id="tabBtnCoverLetter" class="pb-2.5 text-slate-500 hover:text-slate-900 flex items-center gap-1.5 transition">
           <i data-lucide="mail" class="w-4 h-4"></i> Tailored Cover Letter
         </button>
-        <button onclick="switchResumeTab('networking')" id="tabBtnNetworking" class="pb-2.5 text-slate-400 hover:text-white flex items-center gap-1.5 transition">
+        <button onclick="switchResumeTab('networking')" id="tabBtnNetworking" class="pb-2.5 text-slate-500 hover:text-slate-900 flex items-center gap-1.5 transition">
           <i data-lucide="users" class="w-4 h-4"></i> LNCT Alumni & Email Leads
         </button>
       </div>
 
-      <div id="resumeModalLoading" class="py-16 text-center space-y-3">
-        <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p class="text-sm text-slate-300">Gemini is analyzing the JD, finding missing keywords, and preparing your custom resume...</p>
-      </div>
-
-      <!-- TAB 1: VISUAL RESUME DOCUMENT EDITOR (EXACT LATEX REPLICA) -->
-      <div id="resumeTabEditor" class="hidden overflow-y-auto space-y-4 pr-1 flex-1 text-sm">
+      <!-- TAB 1: VISUAL RESUME DOCUMENT EDITOR -->
+      <div id="resumeTabEditor" class="overflow-y-auto space-y-3.5 pr-1 flex-1 text-xs custom-scroll">
         
         <!-- ATS Recruiter Screening Evaluation Banner -->
-        <div id="atsRecruiterEvaluationBanner" class="bg-slate-950 border border-blue-900/40 p-3.5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div id="atsRecruiterEvaluationBanner" class="bg-indigo-50 border border-indigo-200 p-3.5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div class="flex items-start space-x-3">
-            <div id="atsModalVerdictIcon" class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+            <div id="atsModalVerdictIcon" class="w-9 h-9 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-600 shrink-0">
               <i data-lucide="shield-check" class="w-5 h-5"></i>
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <span id="atsModalVerdictTitle" class="text-xs font-bold text-white uppercase tracking-wider">Enterprise ATS & Recruiter Fit Evaluation</span>
-                <span id="atsModalExpBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold">1-3 Yrs Required</span>
+                <span id="atsModalVerdictTitle" class="text-xs font-bold text-indigo-950 uppercase tracking-wider">Enterprise ATS & Recruiter Fit Audit</span>
+                <span id="atsModalExpBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-200 text-indigo-900 font-bold">1-3 Yrs Required</span>
               </div>
-              <p id="atsModalVerdictNotes" class="text-xs text-slate-300 mt-1">Recruiter is analyzing your resume fit against this JD...</p>
+              <p id="atsModalVerdictNotes" class="text-xs text-indigo-800 mt-1">Recruiter is analyzing your resume fit against this JD...</p>
             </div>
           </div>
           <div class="shrink-0 text-right">
-            <span id="atsModalScoreBadge" class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/30">Match: --%</span>
+            <span id="atsModalScoreBadge" class="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-300">Match: --%</span>
           </div>
         </div>
 
         <!-- Missing ATS Keywords Header -->
-        <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-2">
+        <div class="bg-amber-50/70 border border-amber-200 p-3 rounded-xl space-y-1.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <i data-lucide="alert-circle" class="w-4 h-4"></i> Missing ATS Keywords from JD:
+            <span class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600"></i> Missing ATS Keywords from JD:
             </span>
-            <span class="text-[11px] text-slate-400">Click a keyword to copy & inject directly into Technical Skills below</span>
+            <span class="text-[11px] text-amber-700">Click a keyword pill to copy & inject directly into Technical Skills below</span>
           </div>
-          <div id="clickableMissingPills" class="flex flex-wrap gap-2 pt-0.5"></div>
+          <div id="clickableMissingPills" class="flex flex-wrap gap-1.5 pt-0.5"></div>
         </div>
 
         <!-- Sticky Actions Bar -->
-        <div class="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-md border border-slate-700 p-3 rounded-xl flex items-center justify-between shadow-xl">
+        <div class="sticky top-0 z-10 bg-white/95 backdrop-blur-md border border-slate-200 p-2.5 rounded-xl flex items-center justify-between shadow-xs">
           <div class="flex items-center space-x-2">
-            <span class="text-xs font-bold text-white flex items-center gap-1.5">
-              <i data-lucide="file-text" class="w-4 h-4 text-blue-400"></i>
-              Live Resume Editor (Original LaTeX Font & Formatting)
+            <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="file-text" class="w-4 h-4 text-indigo-600"></i>
+              Live LaTeX Document Editor
             </span>
-            <span id="generatedPdfNameLabel" class="text-[11px] text-slate-400 font-mono bg-slate-950 px-2 py-0.5 rounded border border-slate-800">PRIYANSHU_PRIYESH_COMPANY.pdf</span>
+            <span id="generatedPdfNameLabel" class="text-[11px] text-slate-600 font-mono bg-slate-100 px-2 py-0.5 rounded border border-slate-200">PRIYANSHU_PRIYESH_COMPANY.pdf</span>
           </div>
 
           <div class="flex items-center space-x-2">
-            <button onclick="resetBaseResume()" title="Reset back to your default uploaded resume template" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium border border-slate-700 flex items-center gap-1">
+            <button onclick="resetBaseResume()" title="Reset back to your original resume template" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium border border-slate-300 flex items-center gap-1">
               <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
             </button>
-            <button onclick="generateCustomPdf()" id="btnGeneratePdf" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-600/30">
+            <button onclick="generateCustomPdf()" id="btnGeneratePdf" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-indigo-600/30">
               <i data-lucide="save" class="w-3.5 h-3.5"></i> Generate & Save PDF
             </button>
-            <a id="btnDownloadPdf" href="#" target="_blank" class="hidden px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/30">
+            <a id="btnDownloadPdf" href="#" target="_blank" class="hidden px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-emerald-600/30">
               <i data-lucide="download" class="w-3.5 h-3.5"></i> Download PDF
             </a>
           </div>
         </div>
 
-        <!-- Visual In-Place Paper Document (Editable Exact LaTeX Template) -->
-        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex justify-center">
-          <div id="visualResumeDoc" contenteditable="true" spellcheck="false" style="font-family: 'Nimbus Sans L', 'Nimbus Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000000; background: #ffffff; padding: 36px 44px; font-size: 9.46pt; line-height: 1.28; text-align: left;" class="rounded-lg shadow-2xl border border-slate-300 w-full max-w-[850px] min-h-[920px] outline-none select-text">
-            <!-- Header -->
-            <div style="text-align: center; margin-bottom: 8px;">
-              <div style="font-size: 17.93pt; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 2px; color: #000000;">PRIYANSHU PRIYESH</div>
-              <div style="font-size: 9.46pt; font-weight: 400; margin-bottom: 2px; color: #000000;">Software Engineer / SRE — AWS — Kubernetes — Terraform — Platform Engineering</div>
-              <div style="font-size: 8.96pt; font-weight: 400; color: #000000;">8809003179 — priyanshupriyesh78@gmail.com — linkedin.com/in/priyanshu-priyesh-187340233</div>
-            </div>
-
-            <!-- SUMMARY -->
-            <div style="font-size: 10.96pt; font-weight: 700; text-transform: uppercase; border-bottom: 0.5px solid #afafaf; padding-bottom: 1px; margin-top: 10px; margin-bottom: 4px; color: #000000;">SUMMARY</div>
-            <p style="font-size: 9.46pt; line-height: 1.28; text-align: justify; margin: 0 0 6px 0; color: #000000;">
-              Software Engineer / SRE with experience operating production-grade, globally distributed AWS and Kubernetes platforms supporting a large-scale <strong>CPaaS environment</strong>. Hands-on with Amazon EKS, Terraform/Terragrunt, Helm, ArgoCD/GitOps, Gloo Gateway, AWS networking and security, observability, autoscaling, incident response, and infrastructure reliability. Experienced in operating <strong>14+ production EKS clusters across 7 AWS regions and 280+ nodes</strong>, leading platform upgrades and security initiatives, operating Kubernetes-based API gateway infrastructure, standardizing multi-account infrastructure, and improving reliability, operational efficiency, and cloud resource utilization.
-            </p>
-
-            <!-- TECHNICAL SKILLS -->
-            <div style="font-size: 10.96pt; font-weight: 700; text-transform: uppercase; border-bottom: 0.5px solid #afafaf; padding-bottom: 1px; margin-top: 8px; margin-bottom: 4px; color: #000000;">TECHNICAL SKILLS</div>
-            <div style="font-size: 9.46pt; line-height: 1.25; margin-bottom: 6px; color: #000000;">
-              <div style="margin-bottom: 2px;"><strong>Cloud & AWS:</strong> <span id="skill-cloud-text">AWS, Amazon EKS, EC2, VPC, ALB, WAF, Global Accelerator, Shield Advanced, Route 53, CloudFront, API Gateway, Lambda, S3, Kinesis, Athena, Secrets Manager, SSM, CloudWatch, ACM</span></div>
-              <div style="margin-bottom: 2px;"><strong>Kubernetes & Containers:</strong> <span id="skill-k8s-text">Kubernetes, Amazon EKS, Docker, Helm, Gloo Gateway, Kubernetes RBAC, HPA, CSI Drivers, Load Balancer Controllers, RateLimit, ExtAuth, Autoscaling, Cluster Upgrades</span></div>
-              <div style="margin-bottom: 2px;"><strong>Infrastructure as Code:</strong> <span id="skill-iac-text">Terraform, Terragrunt, Atlantis, reusable Terraform modules, multi-account and multi-environment infrastructure</span></div>
-              <div style="margin-bottom: 2px;"><strong>CI/CD & GitOps:</strong> <span id="skill-cicd-text">ArgoCD, GitHub Actions, Atlantis, Jsonnet, GitOps, automated infrastructure and application delivery</span></div>
-              <div style="margin-bottom: 2px;"><strong>Observability & SRE:</strong> <span id="skill-obs-text">Prometheus, VictoriaMetrics, Grafana, Alertmanager, Fluent Bit, OpenSearch, Kibana, CloudWatch, Metrics, Logging, Alerting, Incident Response, RCA, Runbooks, Reliability Engineering</span></div>
-              <div style="margin-bottom: 2px;"><strong>Security & Operations:</strong> <span id="skill-sec-text">IAM, WAF, Shield Advanced, Secrets Management, TLS/Certificates, CVE Remediation, Security Compliance, Jira, Opsgenie, Okta, Confluence</span></div>
-              <div style="margin-bottom: 2px;"><strong>Programming & Systems:</strong> <span id="skill-prog-text">C++, Bash, Linux, Git, GitHub</span></div>
-            </div>
-
-            <!-- PROFESSIONAL EXPERIENCE -->
-            <div style="font-size: 10.96pt; font-weight: 700; text-transform: uppercase; border-bottom: 0.5px solid #afafaf; padding-bottom: 1px; margin-top: 8px; margin-bottom: 4px; color: #000000;">PROFESSIONAL EXPERIENCE</div>
-            <div style="margin-bottom: 6px; color: #000000;">
-              <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                <div style="font-size: 9.96pt; font-weight: 700;">Revent Labs</div>
-                <div style="font-size: 9.46pt; font-weight: 700;">Indore, India</div>
-              </div>
-              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;">
-                <div style="font-size: 9.46pt; font-style: italic;">Software Engineer I</div>
-                <div style="font-size: 9.46pt; font-style: italic;">January 2025 – Present</div>
-              </div>
-
-              <ul style="margin: 0; padding-left: 18px; font-size: 9.46pt; line-height: 1.25;">
-                <li style="margin-bottom: 2.5px; text-align: justify;">Owned <strong>14+ production EKS clusters spanning 7 AWS regions and 280+ nodes</strong> supporting a globally distributed <strong>CPaaS platform</strong>, leading quarterly platform upgrades across EKS versions, node AMIs, CSI drivers, load balancer controllers, autoscaling, certificate management, and secrets management while maintaining <strong>zero customer-facing downtime</strong>.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Worked as part of the <strong>Gateway Engineering team</strong> responsible for operating the Kubernetes-based API gateway layer, managing production <strong>Gloo Gateway Proxy, RateLimit, and ExtAuth pods</strong> across multi-region EKS clusters and troubleshooting gateway traffic, authentication, authorization, rate limiting, and upstream connectivity issues.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Led production incident investigation and RCA across <strong>Kubernetes, gateway, networking, authentication, logging, and deployment systems</strong>, tracing failures across infrastructure and application layers, driving root-cause remediation, and improving platform reliability and operational resilience.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Managed multi-region AWS networking and security infrastructure across <strong>7 regions</strong>, including <strong>AWS WAF, Global Accelerator, ALB, Route 53, and Shield Advanced</strong>; built centralized S3/Athena log analytics for WAF, ALB, and Global Accelerator traffic across Development, QA, and Production environments.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Managed and standardized Terraform/Terragrunt infrastructure across <strong>13+ projects, multiple AWS accounts, and environments</strong>, migrating teams toward reusable infrastructure modules, eliminating IaC anti-patterns, and reducing configuration drift through <strong>Atlantis-based CI/CD workflows</strong>.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Drove security and compliance initiatives including <strong>vendor CVE remediation, mandatory production security rollouts, and regulatory audit logging across 21 GitOps instances</strong>, coordinating infrastructure changes while maintaining production availability.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Delivered Kubernetes cost attribution across environments by integrating clusters with the organization's FinOps platform using custom Helm automation and Terraform-based regional configuration; improved resource efficiency through utilization-driven rightsizing and migration to better-suited AWS node types.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Standardized operational practices through production runbooks, investigation queries, and internal engineering training, enabling more consistent troubleshooting and faster incident response across the wider engineering team.</li>
-              </ul>
-
-              <div style="font-size: 9.96pt; font-weight: 700; margin-top: 5px; margin-bottom: 2px;">Observability & Monitoring</div>
-              <ul style="margin: 0; padding-left: 18px; font-size: 9.46pt; line-height: 1.25;">
-                <li style="margin-bottom: 2.5px; text-align: justify;">Owned the platform observability ecosystem across Kubernetes, applications, and AWS infrastructure, covering <strong>metrics, logging, alerting, dashboards, and operational visibility</strong>.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Designed and maintained the metrics and alerting platform using <strong>Prometheus-style scraping, VictoriaMetrics, Grafana, and Alertmanager</strong>, integrated with Slack and OpsGenie; established <strong>15+ production P1–P3 alerts</strong> covering authentication, Kubernetes health, API Gateway traffic, load balancers, and autoscaling systems.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Maintained centralized logging using <strong>Fluent Bit, S3, OpenSearch, and Kibana</strong>, providing end-to-end visibility across application, Kubernetes, and AWS infrastructure layers.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Developed <strong>7+ Grafana dashboards</strong> and CloudWatch-integrated views for Kubernetes, ALB, WAF, Global Accelerator, authentication, and platform health, mapping operational alerts directly to dashboards for faster incident triage.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Reduced alert fatigue through <strong>threshold tuning, alert inhibition, grouping, and routing improvements</strong> while maintaining actionable coverage of critical production services.</li>
-                <li style="margin-bottom: 2.5px; text-align: justify;">Delivered internal observability training and maintained runbooks covering alert investigation, remediation workflows, and operational troubleshooting.</li>
-              </ul>
-            </div>
-
-            <!-- EDUCATION -->
-            <div style="font-size: 10.96pt; font-weight: 700; text-transform: uppercase; border-bottom: 0.5px solid #afafaf; padding-bottom: 1px; margin-top: 8px; margin-bottom: 4px; color: #000000;">EDUCATION</div>
-            <div style="margin-bottom: 4px; color: #000000;">
-              <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                <div style="font-size: 9.96pt; font-weight: 700;">Lakshmi Narain College of Technology (LNCT)</div>
-                <div style="font-size: 9.46pt; font-weight: 700;">Bhopal, India</div>
-              </div>
-              <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                <div style="font-size: 9.46pt; font-style: italic;">Bachelor of Technology – Computer Science Engineering</div>
-                <div style="font-size: 9.46pt; font-style: italic;">Graduated: 2025</div>
-              </div>
-              <div style="font-size: 9.46pt; font-weight: 700; margin-top: 2px;">CGPA: 8.45/10</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- TAB 2: TAILORED COVER LETTER / APPLICATION PITCH -->
-      <div id="resumeTabCoverLetter" class="hidden overflow-y-auto space-y-4 pr-1 flex-1 text-sm">
-        <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-              <i data-lucide="mail" class="w-4 h-4 text-indigo-400"></i> Tailored Cover Letter / Application Note
-            </span>
-            <button onclick="copyCoverLetter()" class="text-xs text-indigo-300 hover:text-white font-semibold flex items-center gap-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 px-3 py-1.5 rounded-lg transition shadow-sm">
-              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Cover Letter
-            </button>
-          </div>
-          <p class="text-[11px] text-slate-400">
-            Automatically personalized by Gemini with your SRE scale (14+ EKS clusters across 7 AWS regions, zero downtime), multi-region AWS networking, and matching JD requirements. You can edit directly before copying.
-          </p>
-          <textarea id="coverLetterTextarea" oninput="updateCoverLetterWordCount()" rows="13" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-sans leading-relaxed"></textarea>
-          <div class="flex justify-between items-center text-[11px] text-slate-500">
-            <span id="coverLetterWordCount" class="font-mono text-indigo-400">0 words</span>
-            <span>Ready to paste directly into job portal application</span>
+        <!-- Visual Paper Document (Exact LaTeX Format) -->
+        <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 flex justify-center">
+          <div id="visualResumeDoc" contenteditable="true" spellcheck="false" 
+            style="font-family: 'Nimbus Sans L', 'Nimbus Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000000; background: #ffffff; padding: 36px 44px; font-size: 9.46pt; line-height: 1.28; text-align: left;" 
+            class="rounded-lg shadow-md border border-slate-300 w-full max-w-[850px] min-h-[920px] outline-none select-text">
           </div>
         </div>
       </div>
 
-      <!-- TAB 2: NETWORKING, ALUMNI & LEADS -->
-      <div id="resumeTabNetworking" class="hidden overflow-y-auto space-y-5 pr-2 flex-1 text-sm">
-        
-        <!-- 1-Click Targeted Search Links (LinkedIn & Google X-Ray) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
-            <div class="text-xs font-bold text-blue-400 flex items-center gap-1.5">
-              <i data-lucide="graduation-cap" class="w-4 h-4"></i> LNCT Bhopal Alumni
+      <!-- TAB 2: COVER LETTER -->
+      <div id="resumeTabCoverLetter" class="hidden overflow-y-auto space-y-3 pr-1 flex-1 text-xs custom-scroll">
+        <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl flex items-center justify-between">
+          <div>
+            <h4 class="font-bold text-slate-900 text-xs">Tailored Application Note & Cover Pitch</h4>
+            <p class="text-[11px] text-slate-500">Crisp, humanized note highlighting 14+ EKS clusters, zero-downtime upgrades, and platform engineering.</p>
+          </div>
+          <button onclick="copyCoverLetter()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold flex items-center gap-1.5 shadow-xs">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Pitch
+          </button>
+        </div>
+        <textarea id="coverLetterTextarea" rows="12" oninput="updateCoverLetterWordCount()" 
+          class="w-full bg-white border border-slate-300 rounded-xl p-4 text-xs font-sans text-slate-800 leading-relaxed focus:outline-none focus:border-indigo-500"></textarea>
+        <div class="flex justify-between items-center text-[11px] text-slate-500 px-1">
+          <span id="coverLetterWordCount">0 words</span>
+          <span>Tip: Paste into LinkedIn InMail, cold email, or job application cover letter field.</span>
+        </div>
+      </div>
+
+      <!-- TAB 3: NETWORKING & LEADS -->
+      <div id="resumeTabNetworking" class="hidden overflow-y-auto space-y-3.5 pr-1 flex-1 text-xs custom-scroll">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Alumni Search -->
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+            <div class="font-bold text-slate-900 flex items-center gap-1.5">
+              <i data-lucide="graduation-cap" class="w-4 h-4 text-indigo-600"></i>
+              <span>LNCT Bhopal Alumni at this Company</span>
             </div>
-            <p class="text-[11px] text-slate-400">Find alumni from LNCT Bhopal working at this company</p>
-            <div class="flex items-center space-x-2 pt-1">
-              <a id="linkAlumniLinkedin" href="#" target="_blank" class="px-2.5 py-1 rounded bg-blue-600/30 text-blue-300 border border-blue-500/30 text-[10px] font-semibold hover:bg-blue-600/50 flex items-center gap-1">
-                LinkedIn <i data-lucide="external-link" class="w-3 h-3"></i>
-              </a>
-              <a id="linkAlumniXray" href="#" target="_blank" class="px-2.5 py-1 rounded bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold hover:bg-emerald-600/50 flex items-center gap-1">
-                Google X-Ray <i data-lucide="search" class="w-3 h-3"></i>
-              </a>
-            </div>
+            <p class="text-[11px] text-slate-500">1-click search for seniors from LNCT Bhopal working here:</p>
+            <a id="linkAlumniSearch" href="#" target="_blank" class="block w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-center font-bold rounded-lg transition">
+              Find LNCT Alumni on LinkedIn ↗
+            </a>
           </div>
 
-          <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
-            <div class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
-              <i data-lucide="shield" class="w-4 h-4"></i> Engineering Leads & SRE
+          <!-- Hiring Managers Search -->
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+            <div class="font-bold text-slate-900 flex items-center gap-1.5">
+              <i data-lucide="user-check" class="w-4 h-4 text-blue-600"></i>
+              <span>DevOps / SRE Engineering Managers</span>
             </div>
-            <p class="text-[11px] text-slate-400">Find DevOps Leads & Engineering Managers</p>
-            <div class="flex items-center space-x-2 pt-1">
-              <a id="linkManagerLinkedin" href="#" target="_blank" class="px-2.5 py-1 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold hover:bg-indigo-600/50 flex items-center gap-1">
-                LinkedIn <i data-lucide="external-link" class="w-3 h-3"></i>
-              </a>
-              <a id="linkManagerXray" href="#" target="_blank" class="px-2.5 py-1 rounded bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold hover:bg-emerald-600/50 flex items-center gap-1">
-                Google X-Ray <i data-lucide="search" class="w-3 h-3"></i>
-              </a>
-            </div>
-          </div>
-
-          <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
-            <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-              <i data-lucide="user-check" class="w-4 h-4"></i> Tech Recruiters
-            </div>
-            <p class="text-[11px] text-slate-400">Find Talent Acquisition / Recruiters</p>
-            <div class="flex items-center space-x-2 pt-1">
-              <a id="linkRecruiterLinkedin" href="#" target="_blank" class="px-2.5 py-1 rounded bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold hover:bg-emerald-600/50 flex items-center gap-1">
-                LinkedIn <i data-lucide="external-link" class="w-3 h-3"></i>
-              </a>
-              <a id="linkRecruiterXray" href="#" target="_blank" class="px-2.5 py-1 rounded bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold hover:bg-emerald-600/50 flex items-center gap-1">
-                Google X-Ray <i data-lucide="search" class="w-3 h-3"></i>
-              </a>
-            </div>
+            <p class="text-[11px] text-slate-500">Find Engineering Managers & Tech Leads for direct outreach:</p>
+            <a id="linkManagersSearch" href="#" target="_blank" class="block w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-center font-bold rounded-lg transition">
+              Find SRE Managers on LinkedIn ↗
+            </a>
           </div>
         </div>
 
-        <!-- Hunter.io Company Email Pattern -->
-        <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <i data-lucide="mail" class="w-4 h-4 text-orange-400"></i> Company Email Pattern (Hunter.io / Domain)
-            </span>
-            <span id="leadDomainLabel" class="text-xs text-blue-400 font-mono">company.com</span>
-          </div>
-          <div class="text-xs text-slate-400">
-            Common employee email format: <span id="leadEmailPattern" class="text-white font-mono bg-slate-900 px-2 py-0.5 rounded border border-slate-700">{first}.{last}@company.com</span>
-          </div>
-        </div>
-
-        <!-- Humanized LinkedIn Connection Note (Role, Job ID & Referral Purpose) -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <i data-lucide="message-square" class="w-4 h-4 text-blue-400"></i> Humanized LinkedIn Referral Note (Role, Job ID & Purpose)
-            </span>
-            <button onclick="copyNetworkingNote()" class="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1">
+        <!-- 200-Character Humanized Connection Note -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between font-bold text-slate-800">
+            <span class="flex items-center gap-1.5"><i data-lucide="message-square" class="w-4 h-4 text-indigo-600"></i> 200-Character LinkedIn Connection Request Note</span>
+            <button onclick="copyNetworkingNote()" class="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1">
               <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Note
             </button>
           </div>
-          <textarea id="leadNetworkingNote" oninput="updateNoteCharCount()" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-sans"></textarea>
-          <div class="flex justify-between items-center text-[11px]">
-            <span id="noteCharCount" class="font-mono text-emerald-400">0 / 230 characters</span>
-            <span class="text-slate-500">Mentions Role, Job ID & Purpose • Fits LinkedIn 300-char limit</span>
+          <textarea id="leadNetworkingNote" rows="3" readonly class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 select-all"></textarea>
+          <div class="flex justify-between items-center text-[11px] text-slate-500">
+            <span>Tailored to mention the role, company, and 14+ cluster ownership</span>
+            <span id="leadNetworkingNoteChars">0 / 200 chars</span>
           </div>
         </div>
-
       </div>
 
-      <div class="flex justify-end space-x-3 pt-3 border-t border-slate-800">
-        <button onclick="closeResumeModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">Close</button>
-      </div>
     </div>
   </div>
 
   <!-- MODAL: GOOGLE SHEETS SYNC -->
-  <div id="sheetsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <i data-lucide="table" class="w-5 h-5 text-emerald-400"></i>
+  <div id="sheetsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="table" class="w-5 h-5 text-emerald-600"></i>
           Google Sheets Integration
         </h3>
-        <button onclick="closeSheetsModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button onclick="closeSheetsModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <div class="space-y-4 text-sm">
-        <p class="text-xs text-slate-400">
-          Your jobs are always preserved in <code class="bg-slate-950 px-1 py-0.5 rounded text-blue-400">jobs.csv</code>.
-          Every scan and status change mirrors directly to your spreadsheet:
+      <div class="space-y-3.5 text-xs text-slate-600">
+        <p>
+          All scanned jobs and status updates mirror directly to your live Google Sheet:
         </p>
-
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Google Sheet Webhook URL</label>
-          <input type="text" id="sheetsWebhookInput" placeholder="https://script.google.com/macros/s/..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs">
+          <label class="block font-bold text-slate-700 mb-1">Google AppScript Webhook URL</label>
+          <input type="text" id="sheetsWebhookInput" placeholder="https://script.google.com/macros/s/.../exec" 
+            class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-indigo-500">
         </div>
 
         <div class="flex items-center justify-between pt-2">
-          <button onclick="saveSheetsConfig()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold">
+          <button onclick="saveSheetsConfig()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold">
             Save Webhook URL
           </button>
-          <button onclick="syncToSheetsNow()" id="syncNowBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5">
+          <button onclick="syncToSheetsNow()" id="syncNowBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold flex items-center gap-1.5 shadow-sm">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync All Jobs Now
           </button>
         </div>
@@ -699,74 +716,42 @@
     </div>
   </div>
 
-  <!-- MODAL: 1-CLICK AUTOFILL BOOKMARKLET -->
-  <div id="autofillModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 w-full max-w-xl rounded-2xl p-6 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <i data-lucide="zap" class="w-5 h-5 text-amber-400"></i>
-          1-Click Job Application Autofill Setup
+  <!-- MODAL: 1-CLICK AUTOFILL BOOKMARKLET SETUP -->
+  <div id="autofillModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="zap" class="w-5 h-5 text-amber-500"></i>
+          1-Click Autofill Assistant Setup
         </h3>
-        <button onclick="closeAutofillModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button onclick="closeAutofillModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <div class="space-y-4 text-xs text-slate-300">
-        <!-- Draggable bookmark pill -->
-        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center space-y-2">
-          <p class="text-slate-400 text-xs">Drag this button directly to your browser's <strong>Bookmarks Bar</strong> (<kbd class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px]">Cmd+Shift+B</kbd> on Mac):</p>
+      <div class="space-y-4 text-xs text-slate-600">
+        <div class="bg-amber-50/70 p-4 rounded-xl border border-amber-200 text-center space-y-2">
+          <p class="text-slate-700 text-xs font-medium">Drag this button directly to your browser's <strong>Bookmarks Bar</strong> (<kbd class="bg-white border border-slate-300 px-1.5 py-0.5 rounded text-[10px]">Cmd+Shift+B</kbd> on Mac):</p>
           <div class="flex justify-center pt-1">
-            <a id="draggableBookmarkLink" href="#" draggable="true" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs flex items-center gap-2 cursor-grab shadow-lg shadow-amber-500/20 border border-amber-400">
+            <a id="draggableBookmarkLink" href="#" draggable="true" 
+              class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2 cursor-grab shadow-sm border border-amber-400">
               <i data-lucide="zap" class="w-4 h-4 text-slate-950"></i>
               <span>⚡ AutoFill Job (Drag to Bookmarks Bar)</span>
             </a>
           </div>
-          <p class="text-[11px] text-slate-500">Or copy the code below if you prefer to paste it into a new bookmark manually.</p>
         </div>
 
-        <!-- 3-Step Guide -->
-        <div class="space-y-2.5 bg-slate-950/60 p-4 rounded-xl border border-slate-800">
-          <div class="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-1.5 text-blue-400">
-            <i data-lucide="help-circle" class="w-4 h-4"></i> How to use it on any Job Portal:
-          </div>
-
-          <div class="flex items-start gap-2.5">
-            <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-[11px] flex-shrink-0">1</span>
-            <div>
-              <strong class="text-white">Open the application form</strong>: On LinkedIn, Naukri, Greenhouse, or Lever, click <strong>"Apply"</strong> or <strong>"Easy Apply"</strong> so the inputs appear.
-            </div>
-          </div>
-
-          <div class="flex items-start gap-2.5">
-            <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-[11px] flex-shrink-0">2</span>
-            <div>
-              <strong class="text-white">Click your bookmark</strong>: Click <strong class="text-amber-400">⚡ AutoFill Job</strong> in your Bookmarks bar.
-            </div>
-          </div>
-
-          <div class="flex items-start gap-2.5">
-            <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-[11px] flex-shrink-0">3</span>
-            <div>
-              <strong class="text-white">Instant Autofill</strong>: Name, Email, Phone, LinkedIn, GitHub, LNCT College, 1.5 yrs experience, and SRE summary populate automatically with a green confirmation banner!
-            </div>
-          </div>
-        </div>
-
-        <!-- DevTools Alternative -->
-        <div class="space-y-2 pt-1">
-          <div class="flex items-center justify-between">
-            <span class="font-semibold text-slate-400">Manual / DevTools Console Option:</span>
-            <button onclick="copyBookmarkletCode()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1 border border-slate-700">
-              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Code
-            </button>
-          </div>
-          <textarea id="bookmarkletCodeTextarea" readonly rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-[11px] font-mono text-slate-400 focus:outline-none select-all"></textarea>
-          <p class="text-[11px] text-slate-500">Press <kbd class="bg-slate-800 px-1 py-0.5 rounded text-[10px]">Cmd + Option + J</kbd> on any job page, paste this code into the Console, and press Enter.</p>
+        <div class="space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div class="font-bold text-slate-800 text-xs">How it works:</div>
+          <ol class="list-decimal pl-4 space-y-1 text-slate-600 text-xs">
+            <li>Open any application form on LinkedIn, Lever, Greenhouse, or Workday.</li>
+            <li>Click <strong>⚡ AutoFill Job</strong> in your Bookmarks Bar.</li>
+            <li>Your name, email, phone, LNCT college, 1.5 yrs experience, and custom SRE summary populate instantly!</li>
+          </ol>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- JAVASCRIPT LOGIC & STATE ENGINE -->
   <script>
     let allJobs = [];
     let currentJobForResume = null;
@@ -908,11 +893,11 @@
       const stepAi = document.getElementById('stepAi');
       const stepSync = document.getElementById('stepSync');
 
-      stepInit.className = p >= 15 ? 'text-blue-400 font-bold' : 'text-slate-500';
-      stepScrape.className = p >= 30 ? 'text-blue-400 font-bold' : 'text-slate-500';
-      stepFilter.className = p >= 70 ? 'text-blue-400 font-bold' : 'text-slate-500';
-      stepAi.className = p >= 85 ? 'text-blue-400 font-bold' : 'text-slate-500';
-      stepSync.className = p >= 100 ? 'text-emerald-400 font-bold' : 'text-slate-500';
+      stepInit.className = p >= 15 ? 'text-indigo-700 font-bold' : 'text-slate-400';
+      stepScrape.className = p >= 30 ? 'text-indigo-700 font-bold' : 'text-slate-400';
+      stepFilter.className = p >= 70 ? 'text-indigo-700 font-bold' : 'text-slate-400';
+      stepAi.className = p >= 85 ? 'text-indigo-700 font-bold' : 'text-slate-400';
+      stepSync.className = p >= 100 ? 'text-emerald-700 font-bold' : 'text-slate-400';
     }
 
     function renderCategorizedJobs() {
@@ -921,7 +906,6 @@
       const expFilter = document.getElementById('experienceFilter')?.value || 'QUALIFIED';
       const roleFilter = document.getElementById('roleCategoryFilter')?.value || 'ALL';
 
-      // Filter by search, platform, experience, and role
       const filtered = allJobs.filter(j => {
         if (platform !== 'ALL' && j.platform?.toLowerCase() !== platform.toLowerCase()) return false;
 
@@ -944,7 +928,7 @@
         if (expFilter === 'PERFECT_FIT' && v !== 'PERFECT_FIT' && !(j.detectedYearsRequired && j.detectedYearsRequired.includes('0-2'))) return false;
         if (expFilter === 'NO_SENIORS' && isSenior) return false;
 
-        // Search keyword matching
+        // Search text
         if (search) {
           const matchText = `${j.title} ${j.company} ${j.location} ${(j.matchedKeywords || []).join(' ')} ${j.hrExperienceNotes || ''}`.toLowerCase();
           if (!matchText.includes(search)) return false;
@@ -952,7 +936,7 @@
         return true;
       });
 
-      // Split into categories
+      // Split into workflow sections
       const newJobs = [];
       const reviewedJobs = [];
       const appliedJobs = [];
@@ -975,12 +959,12 @@
       document.getElementById('badgeInterviewCount').innerText = interviewJobs.length;
       document.getElementById('badgeRejectedCount').innerText = rejectedJobs.length;
 
-      // Render each container
-      renderJobSection('secNew', newJobs, 'No new jobs found matching filters. Try adjusting experience or role filters above.');
-      renderJobSection('secReviewed', reviewedJobs, 'No jobs in review.');
-      renderJobSection('secApplied', appliedJobs, 'No applied jobs.');
+      // Render containers
+      renderJobSection('secNew', newJobs, 'No new jobs found matching filters. Adjust filters or click "Run Scanner".');
+      renderJobSection('secReviewed', reviewedJobs, 'No jobs in review. Select "Status: Review" on any job to shortlist it.');
+      renderJobSection('secApplied', appliedJobs, 'No applied jobs tracked.');
       renderJobSection('secInterview', interviewJobs, 'No active interview calls.');
-      renderJobSection('secRejected', rejectedJobs, 'No rejected jobs.');
+      renderJobSection('secRejected', rejectedJobs, 'No rejected/archived jobs.');
 
       lucide.createIcons();
     }
@@ -988,7 +972,7 @@
     function renderJobSection(containerId, jobs, emptyText) {
       const container = document.getElementById(containerId);
       if (jobs.length === 0) {
-        container.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs">${emptyText}</div>`;
+        container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">${emptyText}</div>`;
         return;
       }
 
@@ -996,9 +980,9 @@
 
       container.innerHTML = jobs.map(job => {
         const score = job.matchScore || 50;
-        let scoreBadge = 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10';
-        if (score < 80 && score >= 65) scoreBadge = 'border-amber-500/40 text-amber-400 bg-amber-500/10';
-        if (score < 65) scoreBadge = 'border-slate-500/40 text-slate-400 bg-slate-500/10';
+        let scoreBadge = 'border-emerald-300 text-emerald-700 bg-emerald-50';
+        if (score < 80 && score >= 65) scoreBadge = 'border-blue-300 text-blue-700 bg-blue-50';
+        if (score < 65) scoreBadge = 'border-slate-300 text-slate-600 bg-slate-50';
 
         const status = job.status || 'NEW';
 
@@ -1006,54 +990,54 @@
         const expVerdict = job.experienceVerdict || '';
         let expBadge = '';
         if (expVerdict === 'PERFECT_FIT' || (job.detectedYearsRequired && job.detectedYearsRequired.includes('0-2'))) {
-          expBadge = `<span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 0-2 Yrs (Ideal Fit)
+          expBadge = `<span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 0-2 Yrs (Ideal Fit)
           </span>`;
         } else if (expVerdict === 'JUSTIFIABLE_BY_SCALE' || (job.detectedYearsRequired && (job.detectedYearsRequired.includes('1-3') || job.detectedYearsRequired.includes('2-3') || job.detectedYearsRequired.includes('2-4')))) {
-          expBadge = `<span class="px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/30 text-[10px] font-bold flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> 1-3 Yrs (Scale Justified)
+          expBadge = `<span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200 text-[10px] font-bold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span> 1-3 Yrs (Scale Justified)
           </span>`;
         } else if (expVerdict === 'EXPERIENCE_GAP') {
-          expBadge = `<span class="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-bold flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> 3-5 Yrs (Stretch)
+          expBadge = `<span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> 3-5 Yrs (Stretch)
           </span>`;
         } else if (expVerdict === 'UNQUALIFIED_SENIOR') {
-          expBadge = `<span class="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 text-[10px] font-bold flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> 5+ Yrs (Senior - Skip)
+          expBadge = `<span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> 5+ Yrs (Senior - Skip)
           </span>`;
         } else {
-          expBadge = `<span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-medium">
+          expBadge = `<span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-medium">
             ${job.detectedYearsRequired || job.experienceRequired || '0-2 Yrs'}
           </span>`;
         }
 
         const matchedTags = (job.matchedKeywords || []).slice(0, 4).map(k => `
-          <span class="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-300 border border-blue-500/20 text-[10px] font-medium">${k}</span>
+          <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-medium">${k}</span>
         `).join('');
 
         const missingTags = (job.missingKeywords || []).slice(0, 3).map(k => `
-          <span class="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-medium">${k}</span>
+          <span class="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-medium">${k}</span>
         `).join('');
 
         const customResumeNote = job.notes && job.notes.includes('Custom Resume:')
-          ? `<span class="text-[10px] text-emerald-400 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-700/50">📄 ${job.notes.split('Custom Resume:')[1].trim()}</span>`
+          ? `<span class="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">📄 ${job.notes.split('Custom Resume:')[1].trim()}</span>`
           : '';
 
         const hrCallout = job.hrExperienceNotes ? `
-          <div class="mt-2 text-[11px] text-slate-300 bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5"></i>
-            <span><strong class="text-blue-300">Recruiter Screening Verdict:</strong> ${job.hrExperienceNotes}</span>
+          <div class="mt-2 text-[11px] text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5"></i>
+            <span><strong class="text-indigo-900">Recruiter Verdict:</strong> ${job.hrExperienceNotes}</span>
           </div>
         ` : '';
 
-        const isSeniorMuted = expVerdict === 'UNQUALIFIED_SENIOR' ? 'opacity-75 bg-slate-950/30 border-slate-800/60' : '';
+        const isSeniorMuted = expVerdict === 'UNQUALIFIED_SENIOR' ? 'opacity-70 bg-slate-50' : 'bg-white';
 
         return `
-          <div class="glass-card p-4 rounded-xl transition duration-150 ${isSeniorMuted}">
+          <div class="${isSeniorMuted} p-4 rounded-xl border border-slate-200 card-hover shadow-xs">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
               
-              <!-- Left Info -->
-              <div class="flex items-start space-x-3 flex-1 min-w-0">
+              <!-- Left Job Info -->
+              <div class="flex items-start space-x-3.5 flex-1 min-w-0">
                 <div class="w-12 h-12 rounded-xl border flex flex-col items-center justify-center font-bold ${scoreBadge} shrink-0">
                   <span class="text-sm">${score}%</span>
                   <span class="text-[8px] uppercase font-semibold">Match</span>
@@ -1061,46 +1045,46 @@
 
                 <div class="space-y-1 min-w-0">
                   <div class="flex flex-wrap items-center gap-2">
-                    <h3 class="text-sm font-bold text-white hover:text-blue-400 transition cursor-pointer truncate" onclick="window.open('${job.url}', '_blank')">
+                    <h3 class="text-sm font-bold text-slate-900 hover:text-indigo-600 transition cursor-pointer truncate" onclick="window.open('${job.url}', '_blank')">
                       ${job.title}
                     </h3>
-                    <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-medium uppercase">
+                    <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-bold uppercase">
                       ${job.platform}
                     </span>
                     ${expBadge}
                     ${customResumeNote}
                   </div>
 
-                  <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-400">
-                    <span class="font-medium text-slate-200 flex items-center gap-1">
-                      <i data-lucide="building-2" class="w-3 h-3 text-slate-400"></i> ${job.company}
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-500">
+                    <span class="font-semibold text-slate-800 flex items-center gap-1">
+                      <i data-lucide="building-2" class="w-3.5 h-3.5 text-slate-400"></i> ${job.company}
                     </span>
                     <span class="flex items-center gap-1">
-                      <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> ${job.location || 'India'}
+                      <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i> ${job.location || 'India'}
                     </span>
-                    <span class="flex items-center gap-1 text-slate-500">
-                      <i data-lucide="clock" class="w-3 h-3"></i> ${job.postedDate || 'Recent'}
+                    <span class="flex items-center gap-1 text-slate-400">
+                      <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${job.postedDate || 'Recent'}
                     </span>
                   </div>
 
-                  <div class="flex flex-wrap items-center gap-1.5 pt-1.5">
+                  <div class="flex flex-wrap items-center gap-1.5 pt-1">
                     ${matchedTags}
-                    ${missingTags ? `<span class="text-[9px] text-slate-500 ml-1">Missing:</span> ${missingTags}` : ''}
+                    ${missingTags ? `<span class="text-[9px] text-slate-400 ml-1">Missing:</span> ${missingTags}` : ''}
                   </div>
 
                   ${hrCallout}
                 </div>
               </div>
 
-              <!-- Right Actions -->
+              <!-- Right Actions Toolbar -->
               <div class="flex flex-wrap items-center gap-2 shrink-0">
                 <!-- Status Dropdown -->
                 <select onchange="updateJobStatus('${job.id}', this.value)" 
-                  class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none cursor-pointer ${
-                    status === 'APPLIED' ? 'text-indigo-400 border-indigo-500/50' :
-                    status === 'INTERVIEW' ? 'text-amber-400 border-amber-500/50' :
-                    status === 'REVIEWED' ? 'text-cyan-400 border-cyan-500/50' :
-                    status === 'REJECTED' ? 'text-slate-500 border-slate-800' : 'text-slate-300'
+                  class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none cursor-pointer ${
+                    status === 'APPLIED' ? 'text-indigo-700 border-indigo-300 bg-indigo-50/50' :
+                    status === 'INTERVIEW' ? 'text-amber-700 border-amber-300 bg-amber-50/50' :
+                    status === 'REVIEWED' ? 'text-cyan-700 border-cyan-300 bg-cyan-50/50' :
+                    status === 'REJECTED' ? 'text-slate-400 border-slate-200' : 'text-slate-700'
                   }">
                   <option value="NEW" ${status === 'NEW' ? 'selected' : ''}>Status: New</option>
                   <option value="REVIEWED" ${status === 'REVIEWED' ? 'selected' : ''}>Status: Review 🔍</option>
@@ -1109,16 +1093,23 @@
                   <option value="REJECTED" ${status === 'REJECTED' ? 'selected' : ''}>Status: Rejected 🚫</option>
                 </select>
 
+                <!-- 1-Click Live AI Audit Button -->
+                <button onclick="runLiveAudit('${job.id}')" title="Personally visit live job page HTML and audit requirements with Gemini"
+                  class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-medium flex items-center gap-1 transition shadow-xs">
+                  <i data-lucide="scan" class="w-3.5 h-3.5 text-indigo-600"></i>
+                  <span>Live Audit</span>
+                </button>
+
                 <!-- Tailor Resume & Networking Button -->
                 <button onclick="openResumeEditor('${job.id}')" 
-                  class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium flex items-center gap-1.5 transition">
-                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-400"></i>
+                  class="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold flex items-center gap-1.5 transition shadow-xs">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-600"></i>
                   <span>Tailor & Network</span>
                 </button>
 
-                <!-- Open / Apply Button -->
+                <!-- Direct Apply Button -->
                 <button onclick="openJobApplication('${job.url}', '${job.id}')" 
-                  class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1 shadow-md shadow-blue-600/20 transition">
+                  class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center gap-1 shadow-sm shadow-indigo-600/20 transition">
                   <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                   <span>Apply</span>
                 </button>
@@ -1147,15 +1138,44 @@
 
     function openJobApplication(url, jobId) {
       window.open(url, '_blank');
-      // Prompt user to mark applied
       setTimeout(() => {
-        if (confirm(`Application page opened!\n\nWould you like to mark this job as APPLIED now?`)) {
+        if (confirm(`Application portal opened!\n\nWould you like to mark this job as APPLIED now?`)) {
           updateJobStatus(jobId, 'APPLIED');
         }
       }, 1000);
     }
 
-    // RESUME EDITOR, COVER LETTER & NETWORKING MODAL LOGIC
+    // 1-CLICK LIVE AUDIT (Visits live URL & re-evaluates with Gemini ATS)
+    async function runLiveAudit(jobId) {
+      const job = allJobs.find(j => j.id === jobId);
+      if (!job) return;
+
+      const btn = event.currentTarget;
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = `<span class="inline-block w-3 h-3 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></span> Auditing...`;
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/jobs/${jobId}/audit`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success && data.job) {
+          const idx = allJobs.findIndex(j => j.id === jobId);
+          if (idx !== -1) allJobs[idx] = data.job;
+          renderCategorizedJobs();
+          alert(`Live Audit Complete for ${job.title}!\n\nVerdict: ${data.job.experienceVerdict || 'Evaluated'}\nMatch Score: ${data.job.matchScore}%\nNotes: ${data.job.hrExperienceNotes || 'Requirements reviewed.'}`);
+        } else {
+          alert('Audit failed: ' + (data.message || 'Error occurred'));
+        }
+      } catch (err) {
+        alert('Audit error: ' + err.message);
+      } finally {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+        lucide.createIcons();
+      }
+    }
+
+    // RESUME EDITOR & NETWORKING MODAL LOGIC
     function switchResumeTab(tab) {
       const editorTab = document.getElementById('resumeTabEditor');
       const coverTab = document.getElementById('resumeTabCoverLetter');
@@ -1169,8 +1189,8 @@
       if (coverTab) coverTab.classList.add('hidden');
       networkTab.classList.add('hidden');
 
-      const inactive = 'pb-2.5 text-slate-400 hover:text-white flex items-center gap-1.5 transition font-semibold';
-      const active = 'pb-2.5 text-blue-400 border-b-2 border-blue-500 flex items-center gap-1.5 font-bold';
+      const inactive = 'pb-2.5 text-slate-500 hover:text-slate-900 flex items-center gap-1.5 transition font-semibold';
+      const active = 'pb-2.5 text-indigo-600 border-b-2 border-indigo-600 flex items-center gap-1.5 font-bold';
 
       btnEditor.className = inactive;
       if (btnCover) btnCover.className = inactive;
@@ -1197,13 +1217,11 @@
 
       const modal = document.getElementById('resumeModal');
       const info = document.getElementById('resumeModalJobInfo');
-      const loading = document.getElementById('resumeModalLoading');
       const editorTab = document.getElementById('resumeTabEditor');
       const btnDownload = document.getElementById('btnDownloadPdf');
 
       info.innerText = `${job.title} at ${job.company}`;
       modal.classList.remove('hidden');
-      loading.classList.add('hidden');
       editorTab.classList.remove('hidden');
       btnDownload.classList.add('hidden');
 
@@ -1234,25 +1252,25 @@
 
       if (job.experienceVerdict === 'PERFECT_FIT') {
         document.getElementById('atsModalVerdictTitle').innerText = 'PERFECT FIT (0-2 YRS JUNIOR/ASSOCIATE)';
-        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-emerald-400 uppercase tracking-wider';
+        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-emerald-700 uppercase tracking-wider';
       } else if (job.experienceVerdict === 'JUSTIFIABLE_BY_SCALE') {
         document.getElementById('atsModalVerdictTitle').innerText = 'JUSTIFIABLE FIT (SCALE OUTCLASSES 2-3 YRS)';
-        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-blue-400 uppercase tracking-wider';
+        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-indigo-700 uppercase tracking-wider';
       } else if (job.experienceVerdict === 'EXPERIENCE_GAP') {
         document.getElementById('atsModalVerdictTitle').innerText = 'STRETCH ROLE (EXPERIENCE GAP IDENTIFIED)';
-        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-amber-400 uppercase tracking-wider';
+        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-amber-700 uppercase tracking-wider';
       } else if (job.experienceVerdict === 'UNQUALIFIED_SENIOR') {
         document.getElementById('atsModalVerdictTitle').innerText = 'EXPERIENCE MISMATCH (5+ YRS SENIOR / STAFF)';
-        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-rose-400 uppercase tracking-wider';
+        document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-rose-700 uppercase tracking-wider';
       }
 
       switchResumeTab('editor');
 
-      // 2. Set analyzing status on the Missing Keywords bar (NOT blocking the document)
+      // 2. Set analyzing status on the Missing Keywords bar
       const missingContainer = document.getElementById('clickableMissingPills');
       missingContainer.innerHTML = `
-        <div class="flex items-center gap-2 text-xs text-blue-400 py-1">
-          <div class="w-3.5 h-3.5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+        <div class="flex items-center gap-2 text-xs text-indigo-600 py-1 font-semibold">
+          <div class="w-3.5 h-3.5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
           Scanning JD for missing ATS keywords...
         </div>
       `;
@@ -1262,7 +1280,7 @@
       if (job.id) {
         const m = job.id.match(/\d{5,}/);
         if (m) extractedJobId = m[0];
-        else extractedJobId = job.id.replace(/^(li_|in_|ind_)/, '');
+        else extractedJobId = job.id.replace(/^(li_|in_|ind_|wf_|instahyre_)/, '');
       }
       if (!extractedJobId && job.url) {
         const m = job.url.match(/\d{6,}/);
@@ -1270,7 +1288,6 @@
       }
 
       try {
-        // Run parallel: Resume tailoring + Networking lead fetch
         const [tailorRes, networkRes] = await Promise.all([
           fetch('/api/resume/tailor', {
             method: 'POST',
@@ -1291,7 +1308,7 @@
           currentTailorData = tailorData.tailored;
           populateResumeEditor(tailorData.tailored, job);
         } else {
-          missingContainer.innerHTML = '<span class="text-xs text-slate-400">Analysis ready. Click anywhere in your resume below to edit or type.</span>';
+          missingContainer.innerHTML = '<span class="text-xs text-slate-500">Analysis ready. Click anywhere in your resume below to edit or type.</span>';
         }
 
         if (networkData.success && networkData.leadInfo) {
@@ -1301,12 +1318,11 @@
 
       } catch (err) {
         console.warn('Analysis notice:', err.message);
-        missingContainer.innerHTML = '<span class="text-xs text-slate-400">Click anywhere in your resume below to edit or type.</span>';
+        missingContainer.innerHTML = '<span class="text-xs text-slate-500">Click anywhere in your resume below to edit or type.</span>';
       }
     }
 
     function populateResumeEditor(tailored, job) {
-      // 0. Update ATS Recruiter Evaluation Banner
       if (tailored.detectedYearsRequired) {
         document.getElementById('atsModalExpBadge').innerText = `${tailored.detectedYearsRequired}`;
       }
@@ -1317,34 +1333,34 @@
         const v = tailored.experienceVerdict;
         if (v === 'PERFECT_FIT') {
           document.getElementById('atsModalVerdictTitle').innerText = 'PERFECT FIT (0-2 YRS JUNIOR/ASSOCIATE)';
-          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-emerald-400 uppercase tracking-wider';
+          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-emerald-700 uppercase tracking-wider';
         } else if (v === 'JUSTIFIABLE_BY_SCALE') {
           document.getElementById('atsModalVerdictTitle').innerText = 'JUSTIFIABLE FIT (SCALE OUTCLASSES 2-3 YRS)';
-          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-blue-400 uppercase tracking-wider';
+          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-indigo-700 uppercase tracking-wider';
         } else if (v === 'EXPERIENCE_GAP') {
           document.getElementById('atsModalVerdictTitle').innerText = 'STRETCH ROLE (EXPERIENCE GAP IDENTIFIED)';
-          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-amber-400 uppercase tracking-wider';
+          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-amber-700 uppercase tracking-wider';
         } else if (v === 'UNQUALIFIED_SENIOR') {
           document.getElementById('atsModalVerdictTitle').innerText = 'EXPERIENCE MISMATCH (5+ YRS SENIOR / STAFF)';
-          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-rose-400 uppercase tracking-wider';
+          document.getElementById('atsModalVerdictTitle').className = 'text-xs font-bold text-rose-700 uppercase tracking-wider';
         }
       }
 
-      // 1. Missing keywords with 1-click add buttons
+      // Missing keywords
       const missingContainer = document.getElementById('clickableMissingPills');
       const missingList = tailored.missingKeywords || [];
 
       if (missingList.length === 0) {
-        missingContainer.innerHTML = '<span class="text-xs text-emerald-400">✅ No major keywords missing! Great match.</span>';
+        missingContainer.innerHTML = '<span class="text-xs text-emerald-700 font-semibold">✅ No major keywords missing! Great match.</span>';
       } else {
         missingContainer.innerHTML = missingList.map(kw => `
-          <button onclick="injectKeyword('${kw}')" class="px-2.5 py-1 rounded-lg bg-amber-950/60 hover:bg-amber-900 border border-amber-700/60 text-amber-300 text-xs font-semibold flex items-center gap-1 transition">
-            <i data-lucide="plus" class="w-3 h-3"></i> ${kw}
+          <button onclick="injectKeyword('${kw}')" class="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-1 transition shadow-xs">
+            <i data-lucide="plus" class="w-3 h-3 text-amber-700"></i> ${kw}
           </button>
         `).join('');
       }
 
-      // 2. Populate Cover Letter
+      // Populate Cover Letter
       if (tailored.coverLetterPitch) {
         const clEl = document.getElementById('coverLetterTextarea');
         if (clEl) {
@@ -1353,7 +1369,7 @@
         }
       }
 
-      // Initialize visual document with pristine template if empty
+      // Initialize visual document if empty
       const doc = document.getElementById('visualResumeDoc');
       if (!doc.innerHTML || doc.innerHTML.trim().length < 50) {
         doc.innerHTML = BASE_RESUME_HTML;
@@ -1370,26 +1386,17 @@
     }
 
     function injectKeyword(kw) {
-      // 1. Copy to clipboard
       navigator.clipboard.writeText(kw).catch(() => {});
-
-      // 2. Automatically inject into technical skills in the visual editor
       const k8sEl = document.getElementById('skill-k8s-text');
-      const progEl = document.getElementById('skill-prog-text');
-
-      if (kw.toLowerCase().includes('python') || kw.toLowerCase().includes('go') || kw.toLowerCase().includes('bash') || kw.toLowerCase().includes('java')) {
-        if (progEl) {
-          progEl.innerText = `${progEl.innerText}, ${kw}`;
-          progEl.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      } else {
-        if (k8sEl) {
-          k8sEl.innerText = `${k8sEl.innerText}, ${kw}`;
-          k8sEl.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (k8sEl) {
+        const current = k8sEl.innerText.trim();
+        if (!current.toLowerCase().includes(kw.toLowerCase())) {
+          k8sEl.innerText = `${current}, ${kw}`;
+          alert(`Added "${kw}" to Technical Skills in your visual resume!`);
+          return;
         }
       }
-
-      alert(`✅ Copied "${kw}" & appended into Technical Skills in your resume document below!\n\nYou can also click anywhere inside the document to type or edit.`);
+      alert(`Copied "${kw}"! Click anywhere in your resume below and press Cmd+V to paste.`);
     }
 
     async function generateCustomPdf() {
@@ -1397,9 +1404,11 @@
 
       const btn = document.getElementById('btnGeneratePdf');
       const btnDownload = document.getElementById('btnDownloadPdf');
-      btn.innerText = 'Generating PDF...';
+      const doc = document.getElementById('visualResumeDoc');
 
-      const resumeHtml = document.getElementById('visualResumeDoc').innerHTML;
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = `<span class="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span> Rendering PDF...`;
+      btn.disabled = true;
 
       try {
         const res = await fetch('/api/resume/generate-pdf', {
@@ -1407,70 +1416,62 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             company: currentJobForResume.company,
-            resumeHtml,
+            resumeHtml: doc.innerHTML,
             jobId: currentJobForResume.id
           })
         });
 
         const data = await res.json();
-        if (data.success) {
+        if (data.success && data.downloadUrl) {
           btnDownload.href = data.downloadUrl;
+          btnDownload.setAttribute('download', data.filename);
           btnDownload.classList.remove('hidden');
-          btn.innerText = 'Regenerate PDF';
-          alert(`✅ PDF Generated: ${data.filename}\n\nClick "Download PDF" to save it locally!`);
+          btn.innerHTML = `✅ Saved ${data.filename}`;
+
+          setTimeout(() => {
+            window.open(data.downloadUrl, '_blank');
+          }, 400);
+
           fetchJobs();
         } else {
-          alert('PDF Generation notice: ' + data.error);
-          btn.innerText = 'Generate & Save PDF';
+          alert('Failed to generate PDF: ' + (data.message || 'Unknown error'));
+          btn.innerHTML = originalHtml;
         }
       } catch (err) {
-        alert('Error: ' + err.message);
-        btn.innerText = 'Generate & Save PDF';
+        alert('Error generating PDF: ' + err.message);
+        btn.innerHTML = originalHtml;
+      } finally {
+        btn.disabled = false;
+        lucide.createIcons();
       }
     }
 
     function populateNetworkingTab(leadInfo) {
-      document.getElementById('linkAlumniLinkedin').href = leadInfo.linkedinSearches.alumni;
-      document.getElementById('linkAlumniXray').href = leadInfo.googleXraySearches.alumni;
-
-      document.getElementById('linkManagerLinkedin').href = leadInfo.linkedinSearches.managers;
-      document.getElementById('linkManagerXray').href = leadInfo.googleXraySearches.managers;
-
-      document.getElementById('linkRecruiterLinkedin').href = leadInfo.linkedinSearches.recruiters;
-      document.getElementById('linkRecruiterXray').href = leadInfo.googleXraySearches.recruiters;
-
-      document.getElementById('leadDomainLabel').innerText = leadInfo.domain || 'company.com';
-      document.getElementById('leadEmailPattern').innerText = leadInfo.emailPattern || `{first}.{last}@${leadInfo.domain}`;
-
+      const linkAlumni = document.getElementById('linkAlumniSearch');
+      const linkManagers = document.getElementById('linkManagersSearch');
       const noteEl = document.getElementById('leadNetworkingNote');
+      const noteCharsEl = document.getElementById('leadNetworkingNoteChars');
+
+      if (linkAlumni && leadInfo.linkedinSearches?.alumni) {
+        linkAlumni.href = leadInfo.linkedinSearches.alumni;
+      }
+      if (linkManagers && leadInfo.linkedinSearches?.managers) {
+        linkManagers.href = leadInfo.linkedinSearches.managers;
+      }
       if (noteEl) {
         noteEl.value = leadInfo.networkingNote || '';
-        updateNoteCharCount();
+        if (noteCharsEl) {
+          noteCharsEl.innerText = `${(leadInfo.networkingNote || '').length} / 200 chars`;
+        }
       }
       lucide.createIcons();
     }
 
-    function updateNoteCharCount() {
-      const noteEl = document.getElementById('leadNetworkingNote');
-      const counterEl = document.getElementById('noteCharCount');
-      if (!noteEl || !counterEl) return;
-      const len = noteEl.value.length;
-      counterEl.innerText = `${len} / 230 characters`;
-      if (len > 230) {
-        counterEl.className = 'font-mono text-rose-400 font-bold';
-      } else {
-        counterEl.className = 'font-mono text-emerald-400';
-      }
-    }
-
     function copyCoverLetter() {
       const clEl = document.getElementById('coverLetterTextarea');
-      const text = clEl ? clEl.value : (currentTailorData?.coverLetterPitch || '');
-      if (text) {
-        navigator.clipboard.writeText(text);
-        alert('✅ Tailored Cover Letter copied to clipboard!');
-      } else {
-        alert('Cover letter is not ready yet.');
+      if (clEl && clEl.value) {
+        navigator.clipboard.writeText(clEl.value);
+        alert('Tailored Cover Letter copied to clipboard!');
       }
     }
 
@@ -1489,8 +1490,6 @@
       if (text) {
         navigator.clipboard.writeText(text);
         alert('LinkedIn Connection Note copied to clipboard!');
-      } else {
-        alert('No note to copy.');
       }
     }
 
@@ -1524,10 +1523,11 @@
 
       const platforms = [];
       if (document.getElementById('plat_linkedin').checked) platforms.push('linkedin');
-      if (document.getElementById('plat_naukri').checked) platforms.push('naukri');
-      if (document.getElementById('plat_indeed').checked) platforms.push('indeed');
-      if (document.getElementById('plat_wellfound').checked) platforms.push('wellfound');
       if (document.getElementById('plat_instahyre').checked) platforms.push('instahyre');
+      if (document.getElementById('plat_simplify').checked) platforms.push('simplify');
+      if (document.getElementById('plat_uplers').checked) platforms.push('uplers');
+      if (document.getElementById('plat_wellfound').checked) platforms.push('wellfound');
+      if (document.getElementById('plat_naukri').checked) platforms.push('naukri');
 
       closeScanModal();
 
@@ -1537,7 +1537,6 @@
         body: JSON.stringify({ roles: selectedRoles, location, timeFilter, platforms, enableAI })
       });
 
-      // Poll progress every 1.5s
       const poll = setInterval(async () => {
         const res = await fetch('/api/scan/progress');
         const data = await res.json();
@@ -1551,6 +1550,58 @@
       }, 1500);
     }
 
+    // CREDENTIALS & COOKIES MODAL
+    function openCredentialsModal() {
+      document.getElementById('credentialsModal').classList.remove('hidden');
+      loadPlatformCredentials();
+    }
+    function closeCredentialsModal() {
+      document.getElementById('credentialsModal').classList.add('hidden');
+    }
+
+    async function loadPlatformCredentials() {
+      try {
+        const res = await fetch('/api/credentials');
+        const data = await res.json();
+        if (data.success && data.credentials) {
+          const c = data.credentials;
+          if (c.linkedin?.sessionCookie) document.getElementById('cred_li_cookie').value = c.linkedin.sessionCookie;
+          if (c.wellfound?.sessionCookie) document.getElementById('cred_wf_cookie').value = c.wellfound.sessionCookie;
+          if (c.uplers?.email) document.getElementById('cred_uplers_email').value = c.uplers.email;
+          if (c.uplers?.password) document.getElementById('cred_uplers_pass').value = c.uplers.password;
+          if (c.simplify?.token) document.getElementById('cred_simplify_token').value = c.simplify.token;
+          if (c.instahyre?.email) document.getElementById('cred_instahyre_email').value = c.instahyre.email;
+        }
+      } catch (e) {}
+    }
+
+    async function savePlatformCredentials() {
+      const creds = {
+        linkedin: { sessionCookie: document.getElementById('cred_li_cookie').value.trim() },
+        wellfound: { sessionCookie: document.getElementById('cred_wf_cookie').value.trim() },
+        uplers: {
+          email: document.getElementById('cred_uplers_email').value.trim(),
+          password: document.getElementById('cred_uplers_pass').value.trim()
+        },
+        simplify: { token: document.getElementById('cred_simplify_token').value.trim() },
+        instahyre: { email: document.getElementById('cred_instahyre_email').value.trim() }
+      };
+
+      try {
+        const res = await fetch('/api/credentials', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(creds)
+        });
+        const data = await res.json();
+        const msg = document.getElementById('credSaveMsg');
+        msg.innerText = data.success ? '✅ Saved successfully!' : '❌ Save failed';
+        setTimeout(() => msg.innerText = '', 3000);
+      } catch (err) {
+        alert('Error saving credentials: ' + err.message);
+      }
+    }
+
     // SHEETS SYNC
     function openSheetsModal() { document.getElementById('sheetsModal').classList.remove('hidden'); }
     function closeSheetsModal() { document.getElementById('sheetsModal').classList.add('hidden'); }
@@ -1558,42 +1609,51 @@
     async function checkSheetsStatus() {
       try {
         const res = await fetch('/api/sheets/status');
-        const data = await res.json();
+        const d = await res.json();
         const dot = document.getElementById('sheetsStatusDot');
-        if (data.configured) {
-          dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
-          if (data.webhookUrl && !document.getElementById('sheetsWebhookInput').value) {
-            document.getElementById('sheetsWebhookInput').value = data.webhookUrl === 'Configured' ? 'Connected via .env' : data.webhookUrl;
-          }
+        if (d.configured) {
+          dot.className = 'w-2 h-2 rounded-full bg-emerald-500 ml-0.5';
         } else {
-          dot.className = 'w-2 h-2 rounded-full bg-slate-500';
+          dot.className = 'w-2 h-2 rounded-full bg-slate-300 ml-0.5';
         }
       } catch (e) {}
     }
 
     async function saveSheetsConfig() {
       const webhookUrl = document.getElementById('sheetsWebhookInput').value.trim();
-      if (!webhookUrl) return alert('Please enter a Webhook URL');
-      await fetch('/api/sheets/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ webhookUrl })
-      });
-      alert('Saved! You can now sync to your Google Sheet.');
-      checkSheetsStatus();
+      if (!webhookUrl) return;
+
+      try {
+        const res = await fetch('/api/sheets/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ webhookUrl })
+        });
+        const d = await res.json();
+        if (d.success) {
+          alert('Google Sheets Webhook URL saved!');
+          checkSheetsStatus();
+        }
+      } catch (e) {
+        alert('Failed to save Sheets config: ' + e.message);
+      }
     }
 
     async function syncToSheetsNow() {
       const btn = document.getElementById('syncNowBtn');
-      btn.innerText = 'Syncing...';
+      const orig = btn.innerHTML;
+      btn.innerHTML = `<span class="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span> Syncing...`;
+      btn.disabled = true;
+
       try {
         const res = await fetch('/api/sheets/sync', { method: 'POST' });
-        const data = await res.json();
-        alert(data.message);
+        const d = await res.json();
+        alert(d.message || (d.success ? 'Synced successfully!' : 'Sync failed'));
       } catch (e) {
         alert('Sync error: ' + e.message);
       } finally {
-        btn.innerHTML = '<i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync All Jobs Now';
+        btn.innerHTML = orig;
+        btn.disabled = false;
         lucide.createIcons();
       }
     }
@@ -1601,41 +1661,33 @@
     // 1-CLICK AUTOFILL BOOKMARKLET
     function openAutofillModal() {
       document.getElementById('autofillModal').classList.remove('hidden');
+      setupBookmarkletPill();
     }
-
     function closeAutofillModal() {
       document.getElementById('autofillModal').classList.add('hidden');
     }
 
-    function copyBookmarkletCode() {
-      const ta = document.getElementById('bookmarkletCodeTextarea');
-      if (ta && ta.value) {
-        navigator.clipboard.writeText(ta.value);
-        alert('✅ 1-Click Autofill code copied to clipboard!\n\nYou can now:\n1. Paste into a new Bookmark URL\nOR\n2. Open Console (Cmd+Option+J) on any application form and paste!');
-      }
-    }
-
-    async function loadBookmarklet() {
+    async function setupBookmarkletPill() {
       try {
         const res = await fetch('/api/autofill/bookmarklet');
-        const data = await res.json();
-        if (data.success && data.code) {
-          const link = document.getElementById('draggableBookmarkLink');
-          const textarea = document.getElementById('bookmarkletCodeTextarea');
-          if (link) link.href = data.code;
-          if (textarea) textarea.value = data.code;
+        const d = await res.json();
+        if (d.success && d.code) {
+          const rawCode = d.code.trim();
+          const encoded = `javascript:(function(){${encodeURIComponent(rawCode)}})();`;
+          const dragLink = document.getElementById('draggableBookmarkLink');
+          if (dragLink) dragLink.href = encoded;
         }
-      } catch (e) {
-        console.warn('Failed to load bookmarklet code:', e);
-      }
+      } catch (e) {}
     }
 
     // INITIALIZATION
-    fetchCandidateProfile();
-    fetchJobs();
-    checkSheetsStatus();
-    loadBookmarklet();
-    setInterval(fetchJobs, 20000);
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchJobs();
+      fetchCandidateProfile();
+      checkSheetsStatus();
+      setupBookmarkletPill();
+      setInterval(fetchJobs, 12000);
+    });
   </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 export interface JobListing {
   id: string;
-  platform: 'linkedin' | 'naukri' | 'indeed' | 'wellfound' | 'instahyre' | 'glassdoor' | 'foundit' | 'hirect' | 'upler' | string;
+  platform: 'linkedin' | 'naukri' | 'indeed' | 'wellfound' | 'instahyre' | 'simplify' | 'uplers' | 'glassdoor' | 'foundit' | 'hirect' | string;
   title: string;
   company: string;
   location: string;

@@ -1,8 +1,12 @@
+import axios from 'axios';
+import * as cheerio from 'cheerio';
 import { BaseScraper } from './base.js';
 import { JobListing, SearchConfig } from '../types/index.js';
+import { CredentialsStore } from '../storage/credentials_store.js';
 
 export class WellfoundScraper extends BaseScraper {
   platformName = 'wellfound';
+  private credentialsStore = new CredentialsStore();
 
   constructor(config: SearchConfig) {
     super(config);
@@ -10,64 +14,97 @@ export class WellfoundScraper extends BaseScraper {
 
   async searchJobs(query: string, location: string): Promise<JobListing[]> {
     const jobs: JobListing[] = [];
-    const limit = this.config.scraping.maxJobsPerPlatform || 15;
+    const limit = this.config.scraping.maxJobsPerPlatform || 20;
 
-    console.log(`[Wellfound] Searching for "${query}" in "${location}"...`);
+    console.log(`[Wellfound] Searching startup opportunities for "${query}"...`);
+
+    const creds = this.credentialsStore.getPlatformCredentials('wellfound');
+    const headers: Record<string, string> = {
+      'User-Agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+    };
+
+    if (creds?.sessionCookie) {
+      headers['Cookie'] = `_wellfound_session=${creds.sessionCookie}`;
+    }
 
     try {
-      const { page } = await this.initBrowser();
+      // 1. Fast Next.js __NEXT_DATA__ extraction
+      const targetUrls = [
+        `https://wellfound.com/jobs`,
+        `https://wellfound.com/role/devops-engineer`,
+        `https://wellfound.com/role/cloud-engineer`
+      ];
 
-      const url = `https://wellfound.com/jobs?role=${encodeURIComponent(
-        query
-      )}&location=${encodeURIComponent(location)}`;
+      for (const targetUrl of targetUrls) {
+        if (jobs.length >= limit) break;
 
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-      await page.waitForTimeout(3500);
+        try {
+          const resp = await axios.get(targetUrl, { headers, timeout: 10000 });
+          const $ = cheerio.load(resp.data);
+          const nextDataEl = $('script[id=__NEXT_DATA__]');
 
-      const cards = await page.$$('[data-test="JobSearchResult"], .styles_result__');
+          if (nextDataEl.length > 0) {
+            const nextData = JSON.parse(nextDataEl.html() || '{}');
+            const apollo = nextData.props?.pageProps?.apolloState?.data || {};
 
-      for (let i = 0; i < cards.length && jobs.length < limit; i++) {
-        const card = cards[i];
+            const jobKeys = Object.keys(apollo).filter((k) => k.startsWith('JobListing:'));
 
-        const title = (
-          await card.$eval('[data-test="JobTitle"], .styles_title__', (el: any) => el.innerText).catch(() => '')
-        ).trim();
+            for (const key of jobKeys) {
+              if (jobs.length >= limit) break;
 
-        const company = (
-          await card.$eval('[data-test="StartupName"], .styles_company__', (el: any) => el.innerText).catch(() => '')
-        ).trim();
+              const item = apollo[key];
+              const startupRef = item.startup?.__ref;
+              const startup = startupRef ? apollo[startupRef] : {};
 
-        const loc = (
-          await card.$eval('[data-test="JobLocation"], .styles_location__', (el: any) => el.innerText).catch(() => location)
-        ).trim();
+              const title = item.title || item.slug?.replace(/-/g, ' ') || 'Software Engineer';
+              const company = startup.name || 'Top YC Startup';
+              const compensation = item.compensation || '';
+              const locNames = Array.isArray(item.locationNames) ? item.locationNames.join(', ') : location || 'Remote';
+              const isRemote = item.remote || false;
+              const slug = item.slug || '';
+              const id = item.id || key.replace('JobListing:', '');
 
-        const linkEl = await card.$('a[data-test="JobTitle"], a');
-        let link = linkEl ? await linkEl.getAttribute('href') : '';
-        if (link && !link.startsWith('http')) {
-          link = `https://wellfound.com${link}`;
-        }
+              const link = slug ? `https://wellfound.com/jobs/${id}-${slug}` : `https://wellfound.com/jobs/${id}`;
 
-        if (title && company) {
-          jobs.push({
-            id: `wf_${title}_${company}`.toLowerCase().replace(/[^a-z0-9]/g, '_'),
-            platform: 'wellfound',
-            title,
-            company,
-            location: loc || location,
-            experienceRequired: '0-2 years',
-            url: link || 'https://wellfound.com',
-            status: 'NEW',
-            workMode: loc.toLowerCase().includes('remote') ? 'Remote' : 'Unspecified'
-          });
+              // Check relevance
+              const queryTerms = query.toLowerCase().split(/\s+/);
+              const titleLower = title.toLowerCase();
+              const isRelevant = queryTerms.some((t) => titleLower.includes(t)) ||
+                titleLower.includes('engineer') || titleLower.includes('devops') || titleLower.includes('platform');
+
+              if (isRelevant) {
+                jobs.push({
+                  id: `wf_${id}`,
+                  platform: 'wellfound',
+                  title,
+                  company,
+                  location: isRemote ? `${locNames} (Remote)` : locNames,
+                  experienceRequired: '0-2 years (Startup)',
+                  detectedYearsRequired: '0-2 years',
+                  experienceVerdict: 'PERFECT_FIT',
+                  hrExperienceNotes: `Wellfound high-growth startup role. Comp: ${compensation || 'Market Rate'}.`,
+                  salary: compensation,
+                  postedDate: 'Recent',
+                  url: link,
+                  description: `${title} at ${company}. ${compensation ? `Compensation: ${compensation}.` : ''} Location: ${locNames}. High-growth venture backed startup opportunity via Wellfound.`,
+                  status: 'NEW',
+                  workMode: isRemote ? 'Remote' : 'Unspecified'
+                });
+              }
+            }
+          }
+        } catch {
+          // continue
         }
       }
+
+      console.log(`[Wellfound] Found ${jobs.length} startup jobs`);
     } catch (err: any) {
-      console.warn(`[Wellfound] Notice: ${err.message}`);
-    } finally {
-      await this.close();
+      console.warn(`[Wellfound] Error: ${err.message}`);
     }
 
     return jobs;
   }
 }
-

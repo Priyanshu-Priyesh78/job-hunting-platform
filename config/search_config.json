@@ -65,14 +65,12 @@
   ],
   "platforms": [
     "linkedin",
-    "naukri",
-    "indeed",
-    "wellfound",
     "instahyre",
-    "glassdoor",
-    "foundit",
-    "hirect",
-    "upler"
+    "simplify",
+    "uplers",
+    "wellfound",
+    "naukri",
+    "indeed"
   ],
   "chromeExecutablePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   "scraping": {

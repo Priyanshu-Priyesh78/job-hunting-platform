@@ -1,9 +1,13 @@
+import axios from 'axios';
+import * as cheerio from 'cheerio';
 import { SearchConfig, JobListing, CandidateProfile } from '../types/index.js';
 import { LinkedInScraper } from './linkedin.js';
 import { NaukriScraper } from './naukri.js';
 import { IndeedScraper } from './indeed.js';
 import { WellfoundScraper } from './wellfound.js';
 import { InstahyreScraper } from './instahyre.js';
+import { SimplifyScraper } from './simplify.js';
+import { UplersScraper } from './uplers.js';
 import { FounditScraper } from './foundit.js';
 import { GlassdoorScraper } from './glassdoor.js';
 import { GeminiAI } from '../ai/gemini.js';
@@ -31,6 +35,10 @@ export class ScraperManager {
         return new WellfoundScraper(this.config);
       case 'instahyre':
         return new InstahyreScraper(this.config);
+      case 'simplify':
+        return new SimplifyScraper(this.config);
+      case 'uplers':
+        return new UplersScraper(this.config);
       case 'foundit':
         return new FounditScraper(this.config);
       case 'glassdoor':
@@ -137,7 +145,16 @@ export class ScraperManager {
         console.log(`[${i + 1}/${topJobs.length}] Recruiter Audit: ${job.title} at ${job.company}`);
 
         try {
-          const textToAnalyze = job.description || `${job.title} at ${job.company}. Required skills: DevOps, AWS, Kubernetes, Terraform, CI/CD, Observability, SRE. Experience: 0-2 years.`;
+          // If description is missing or brief, visit the live page HTML directly
+          if (!job.description || job.description.length < 150) {
+            console.log(`   🌐 Visiting live ${job.platform.toUpperCase()} URL to audit full requirements...`);
+            const liveHtmlDesc = await this.fetchLiveJobDescription(job.url, job.platform);
+            if (liveHtmlDesc && liveHtmlDesc.length > 50) {
+              job.description = liveHtmlDesc;
+            }
+          }
+
+          const textToAnalyze = job.description || `${job.title} at ${job.company}. Location: ${job.location || 'India'}.`;
           const analysis = await this.ai.analyzeJobDescription(
             {
               title: job.title,
@@ -227,6 +244,34 @@ export class ScraperManager {
       const score = Math.min(95, Math.round(55 + (matched.length / 5) * 18));
       job.matchScore = score;
       job.recommendation = score >= 80 ? 'HIGHLY_RECOMMENDED' : score >= 65 ? 'GOOD_MATCH' : 'WEAK_MATCH';
+    }
+  }
+
+  async fetchLiveJobDescription(url: string, platform?: string): Promise<string> {
+    if (!url || !url.startsWith('http')) return '';
+
+    try {
+      if (platform === 'linkedin') {
+        const liScraper = new LinkedInScraper(this.config);
+        return await liScraper.fetchJobDescription(url);
+      }
+
+      const resp = await axios.get(url, {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        },
+        timeout: 8000
+      });
+
+      const $ = cheerio.load(resp.data);
+      const mainText = $('article, main, .job-description, .description, #job-description, .posting-requirements, .content').text().replace(/\s+/g, ' ').trim() ||
+        $('body').text().replace(/\s+/g, ' ').trim();
+
+      return mainText.slice(0, 4500);
+    } catch {
+      return '';
     }
   }
 }

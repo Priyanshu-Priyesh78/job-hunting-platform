@@ -6,3 +6,4 @@ session_cookies/
 user_data/
 resumes/*.pdf
 !resumes/.gitkeep
+config/credentials.json
