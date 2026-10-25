@@ -1,6 +1,6 @@
 export interface JobListing {
   id: string;
-  platform: 'linkedin' | 'naukri' | 'indeed' | 'wellfound' | 'instahyre' | 'simplify' | 'uplers' | 'glassdoor' | 'foundit' | 'hirect' | string;
+  platform: 'linkedin' | 'naukri' | 'indeed' | 'wellfound' | 'instahyre' | 'simplify' | 'uplers' | 'glassdoor' | 'foundit' | 'hirect' | 'direct_ats' | string;
   title: string;
   company: string;
   location: string;
@@ -22,6 +22,8 @@ export interface JobListing {
   status?: 'NEW' | 'REVIEWED' | 'APPLYING' | 'APPLIED' | 'REJECTED' | 'INTERVIEW';
   appliedDate?: string;
   notes?: string;
+  isDirectATS?: boolean;
+  atsProvider?: 'Greenhouse' | 'Lever' | 'Workday' | 'Ashby' | 'Workable' | 'SmartRecruiters' | 'iCIMS' | 'BambooHR' | 'Rippling' | string;
 }
 
 export interface CandidateProfile {

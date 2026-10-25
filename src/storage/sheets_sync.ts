@@ -50,6 +50,8 @@ export class GoogleSheetsSync {
       const header = [
         'ID',
         'Platform',
+        'Direct ATS',
+        'ATS Provider',
         'Title',
         'Company',
         'Location',
@@ -68,6 +70,8 @@ export class GoogleSheetsSync {
       const rows = jobs.map((j) => [
         j.id,
         j.platform,
+        j.isDirectATS ? 'YES' : 'NO',
+        j.atsProvider || '',
         j.title,
         j.company,
         j.location,

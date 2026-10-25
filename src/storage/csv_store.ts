@@ -3,6 +3,7 @@ import path from 'path';
 import { createObjectCsvWriter } from 'csv-writer';
 import csvParser from 'csv-parser';
 import { JobListing } from '../types/index.js';
+import { detectATSProvider } from '../utils/ats_detector.js';
 
 const CSV_FILE_PATH = path.resolve(process.cwd(), 'jobs.csv');
 
@@ -20,6 +21,8 @@ const CSV_HEADERS = [
   { id: 'recommendation', title: 'Recommendation' },
   { id: 'matchedKeywords', title: 'Matched Keywords' },
   { id: 'missingKeywords', title: 'Missing Keywords' },
+  { id: 'isDirectATS', title: 'Direct ATS' },
+  { id: 'atsProvider', title: 'ATS Provider' },
   { id: 'url', title: 'Application URL' },
   { id: 'status', title: 'Status' },
   { id: 'postedDate', title: 'Date Posted' },
@@ -45,6 +48,18 @@ export class JobStore {
       fs.createReadStream(this.filePath)
         .pipe(csvParser())
         .on('data', (data) => {
+          const rawUrl = data['Application URL'] || data.url || '';
+          let isDirect = data['Direct ATS'] === 'true' || data.isDirectATS === 'true' || data.isDirectATS === true;
+          let atsProv = data['ATS Provider'] || data.atsProvider || '';
+
+          if (!isDirect && rawUrl) {
+            const detected = detectATSProvider(rawUrl);
+            if (detected.isDirectATS) {
+              isDirect = true;
+              atsProv = detected.atsProvider;
+            }
+          }
+
           results.push({
             id: data.ID || data.id,
             platform: data.Platform || data.platform || 'unknown',
@@ -59,7 +74,9 @@ export class JobStore {
             recommendation: data.Recommendation || data.recommendation,
             matchedKeywords: data['Matched Keywords'] ? data['Matched Keywords'].split(', ') : [],
             missingKeywords: data['Missing Keywords'] ? data['Missing Keywords'].split(', ') : [],
-            url: data['Application URL'] || data.url || '',
+            isDirectATS: isDirect,
+            atsProvider: atsProv,
+            url: rawUrl,
             status: data.Status || data.status || 'NEW',
             postedDate: data['Date Posted'] || data.postedDate || '',
             appliedDate: data['Date Applied'] || data.appliedDate || '',
@@ -142,27 +159,39 @@ export class JobStore {
       header: CSV_HEADERS
     });
 
-    const records = jobs.map((j) => ({
-      id: j.id,
-      platform: j.platform,
-      title: j.title,
-      company: j.company,
-      location: j.location,
-      experienceRequired: j.experienceRequired || '',
-      detectedYearsRequired: j.detectedYearsRequired || '',
-      experienceVerdict: j.experienceVerdict || '',
-      hrExperienceNotes: j.hrExperienceNotes || '',
-      matchScore: j.matchScore ?? '',
-      recommendation: j.recommendation ?? '',
-      matchedKeywords: (j.matchedKeywords || []).join(', '),
-      missingKeywords: (j.missingKeywords || []).join(', '),
-      url: j.url,
-      status: j.status || 'NEW',
-      postedDate: j.postedDate || '',
-      appliedDate: j.appliedDate || '',
-      notes: j.notes || '',
-      description: (j.description || '').slice(0, 500)
-    }));
+    const records = jobs.map((j) => {
+      let isDirect = j.isDirectATS;
+      let atsProv = j.atsProvider;
+      if (isDirect === undefined && j.url) {
+        const detected = detectATSProvider(j.url);
+        isDirect = detected.isDirectATS;
+        atsProv = detected.atsProvider;
+      }
+
+      return {
+        id: j.id,
+        platform: j.platform,
+        title: j.title,
+        company: j.company,
+        location: j.location,
+        experienceRequired: j.experienceRequired || '',
+        detectedYearsRequired: j.detectedYearsRequired || '',
+        experienceVerdict: j.experienceVerdict || '',
+        hrExperienceNotes: j.hrExperienceNotes || '',
+        matchScore: j.matchScore ?? '',
+        recommendation: j.recommendation ?? '',
+        matchedKeywords: (j.matchedKeywords || []).join(', '),
+        missingKeywords: (j.missingKeywords || []).join(', '),
+        isDirectATS: isDirect ? 'true' : 'false',
+        atsProvider: atsProv || '',
+        url: j.url,
+        status: j.status || 'NEW',
+        postedDate: j.postedDate || '',
+        appliedDate: j.appliedDate || '',
+        notes: j.notes || '',
+        description: (j.description || '').slice(0, 500)
+      };
+    });
 
     await csvWriter.writeRecords(records);
   }

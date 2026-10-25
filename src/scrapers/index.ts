@@ -10,7 +10,9 @@ import { SimplifyScraper } from './simplify.js';
 import { UplersScraper } from './uplers.js';
 import { FounditScraper } from './foundit.js';
 import { GlassdoorScraper } from './glassdoor.js';
+import { DirectATSScraper } from './direct_ats.js';
 import { GeminiAI } from '../ai/gemini.js';
+import { detectATSProvider } from '../utils/ats_detector.js';
 
 export class ScraperManager {
   private config: SearchConfig;
@@ -43,6 +45,12 @@ export class ScraperManager {
         return new FounditScraper(this.config);
       case 'glassdoor':
         return new GlassdoorScraper(this.config);
+      case 'direct_ats':
+      case 'greenhouse':
+      case 'lever':
+      case 'workday':
+      case 'ashby':
+        return new DirectATSScraper(this.config);
       default:
         return null;
     }
@@ -191,24 +199,50 @@ export class ScraperManager {
   }
 
   private evaluateKeywordsAndSeniority(job: JobListing): void {
+    // 1. Auto-detect Direct ATS portals (Greenhouse, Lever, Workday, Ashby, etc.)
+    if (job.url) {
+      const ats = detectATSProvider(job.url);
+      if (ats.isDirectATS) {
+        job.isDirectATS = true;
+        if (!job.atsProvider) job.atsProvider = ats.atsProvider;
+      }
+    }
+
     const titleLower = job.title.toLowerCase();
     const text = `${job.title} ${job.company} ${job.description || ''}`.toLowerCase();
     const matched: string[] = [];
     const missing: string[] = [];
 
+    // Filter out obvious non-engineering / non-infrastructure roles
+    const nonTechRoles = [
+      'sales', 'account executive', 'account manager', 'recruiter', 'talent acquisition',
+      'human resources', 'legal counsel', 'finance analyst', 'graphic designer',
+      'marketing manager', 'product marketing', 'customer success'
+    ];
+    const isNonTech = nonTechRoles.some(r => titleLower.includes(r));
+    if (isNonTech) {
+      job.detectedYearsRequired = 'Non-Technical Role';
+      job.experienceVerdict = 'EXPERIENCE_GAP';
+      job.isExperienceMatch = false;
+      job.hrExperienceNotes = 'Flagged as non-infrastructure / non-technical position.';
+      job.matchScore = 20;
+      job.recommendation = 'NOT_RECOMMENDED';
+      return;
+    }
+
     // Check for strict senior / lead / staff titles
     const isSeniorTitle = /\b(senior|sr\.|sr|lead|staff|principal|director|head of|vp|architect)\b/i.test(titleLower) &&
       !titleLower.includes('junior') && !titleLower.includes('associate');
 
-    // Check for high experience mentions in text (5+ to 12+ years)
-    const highExpMatch = text.match(/\b([5-9]|1[0-5])\+?\s*(?:to|-)\s*(\d+)?\s*(?:years?|yrs?)/i) ||
-      text.match(/\b([5-9]|1[0-5])\+?\s*(?:years?|yrs?)\s*(?:of\s*)?(?:experience|exp)/i);
+    // Check for high experience mentions in text (4+ to 15+ years)
+    const highExpMatch = text.match(/\b([4-9]|1[0-5])\+?\s*(?:to|-)\s*(\d+)?\s*(?:years?|yrs?)/i) ||
+      text.match(/\b([4-9]|1[0-5])\+?\s*(?:years?|yrs?)\s*(?:of\s*)?(?:experience|exp)/i);
 
     if (isSeniorTitle || highExpMatch) {
-      job.detectedYearsRequired = highExpMatch ? highExpMatch[0] : '5+ years (Senior Level)';
+      job.detectedYearsRequired = highExpMatch ? highExpMatch[0] : '4+ years (Senior/Lead Level)';
       job.experienceVerdict = 'UNQUALIFIED_SENIOR';
       job.isExperienceMatch = false;
-      job.hrExperienceNotes = 'Role specifies Senior/Lead/Staff level demanding 5+ years of experience. Flagged as experience mismatch.';
+      job.hrExperienceNotes = 'Role specifies Senior/Lead/Staff level demanding 4+ years of experience. Filtered as experience gap.';
       job.matchScore = 35;
       job.recommendation = 'NOT_RECOMMENDED';
     } else {
@@ -241,7 +275,8 @@ export class ScraperManager {
     job.missingKeywords = missing;
 
     if (!job.matchScore && job.experienceVerdict !== 'UNQUALIFIED_SENIOR') {
-      const score = Math.min(95, Math.round(55 + (matched.length / 5) * 18));
+      let score = Math.min(95, Math.round(60 + (matched.length / 5) * 18));
+      if (job.isDirectATS) score = Math.min(98, score + 5); // Priority boost for direct ATS
       job.matchScore = score;
       job.recommendation = score >= 80 ? 'HIGHLY_RECOMMENDED' : score >= 65 ? 'GOOD_MATCH' : 'WEAK_MATCH';
     }

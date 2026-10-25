@@ -186,3 +186,4 @@ export class UplersScraper extends BaseScraper {
     return jobs;
   }
 }
+

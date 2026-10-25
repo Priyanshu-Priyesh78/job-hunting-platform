@@ -53,3 +53,4 @@ export class CredentialsStore {
     return (creds as any)[platform.toLowerCase()] || null;
   }
 }
+
