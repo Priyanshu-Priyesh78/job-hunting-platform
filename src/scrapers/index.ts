@@ -13,6 +13,8 @@ import { GlassdoorScraper } from './glassdoor.js';
 import { DirectATSScraper } from './direct_ats.js';
 import { GeminiAI } from '../ai/gemini.js';
 import { detectATSProvider } from '../utils/ats_detector.js';
+import { isEligibleCandidateLocation } from '../utils/location_validator.js';
+import { validateRoleRelevance } from '../utils/role_validator.js';
 
 export class ScraperManager {
   private config: SearchConfig;
@@ -213,55 +215,55 @@ export class ScraperManager {
     const matched: string[] = [];
     const missing: string[] = [];
 
-    // Filter out obvious non-engineering / non-infrastructure roles
-    const nonTechRoles = [
-      'sales', 'account executive', 'account manager', 'recruiter', 'talent acquisition',
-      'human resources', 'legal counsel', 'finance analyst', 'graphic designer',
-      'marketing manager', 'product marketing', 'customer success'
-    ];
-    const isNonTech = nonTechRoles.some(r => titleLower.includes(r));
-    if (isNonTech) {
-      job.detectedYearsRequired = 'Non-Technical Role';
+    // 2. Strict Location Filter (Candidate is based in India; accepts India & Worldwide Remote only)
+    if (job.location && !isEligibleCandidateLocation(job.location, job.workMode)) {
+      job.detectedYearsRequired = 'Ineligible Location';
       job.experienceVerdict = 'EXPERIENCE_GAP';
       job.isExperienceMatch = false;
-      job.hrExperienceNotes = 'Flagged as non-infrastructure / non-technical position.';
+      job.hrExperienceNotes = `Location (${job.location}) is outside India and not Global Remote. Candidate is eligible only for India or Worldwide Remote.`;
       job.matchScore = 20;
       job.recommendation = 'NOT_RECOMMENDED';
       return;
     }
 
-    // Check for strict senior / lead / staff titles
-    const isSeniorTitle = /\b(senior|sr\.|sr|lead|staff|principal|director|head of|vp|architect)\b/i.test(titleLower) &&
-      !titleLower.includes('junior') && !titleLower.includes('associate');
+    // 3. Strict Infrastructure Role Relevance Filter
+    const roleCheck = validateRoleRelevance(job.title, job.description);
+    if (!roleCheck.isRelevant) {
+      job.detectedYearsRequired = 'Non-Infrastructure Role';
+      job.experienceVerdict = 'EXPERIENCE_GAP';
+      job.isExperienceMatch = false;
+      job.hrExperienceNotes = roleCheck.reason || 'Flagged as non-infrastructure position (not SRE/DevOps/Cloud/Platform).';
+      job.matchScore = 20;
+      job.recommendation = 'NOT_RECOMMENDED';
+      return;
+    }
 
-    // Check for high experience mentions in text (4+ to 15+ years)
-    const highExpMatch = text.match(/\b([4-9]|1[0-5])\+?\s*(?:to|-)\s*(\d+)?\s*(?:years?|yrs?)/i) ||
-      text.match(/\b([4-9]|1[0-5])\+?\s*(?:years?|yrs?)\s*(?:of\s*)?(?:experience|exp)/i);
-
-    if (isSeniorTitle || highExpMatch) {
-      job.detectedYearsRequired = highExpMatch ? highExpMatch[0] : '4+ years (Senior/Lead Level)';
+    // 4. Strict Seniority Check
+    if (roleCheck.isSeniorMismatch) {
+      job.detectedYearsRequired = '4+ years (Senior/Lead Level)';
       job.experienceVerdict = 'UNQUALIFIED_SENIOR';
       job.isExperienceMatch = false;
-      job.hrExperienceNotes = 'Role specifies Senior/Lead/Staff level demanding 4+ years of experience. Filtered as experience gap.';
+      job.hrExperienceNotes = roleCheck.reason || 'Role specifies Senior/Lead/Staff level demanding 4+ years of experience.';
       job.matchScore = 35;
       job.recommendation = 'NOT_RECOMMENDED';
-    } else {
-      // Check for junior / 0-3 years mentions
-      const juniorMatch = text.match(/\b(0|1|2|3)\s*(?:to|-)\s*(2|3|4)\s*(?:years?|yrs?)/i) ||
-        text.match(/\b(0|1|2)\+?\s*(?:years?|yrs?)/i) ||
-        titleLower.includes('junior') || titleLower.includes('associate') || titleLower.includes('entry');
+      return;
+    }
 
-      if (juniorMatch) {
-        job.detectedYearsRequired = typeof juniorMatch === 'object' && juniorMatch[0] ? juniorMatch[0] : '0-2 years';
-        job.experienceVerdict = 'PERFECT_FIT';
-        job.isExperienceMatch = true;
-        job.hrExperienceNotes = 'Matches 0-2 years junior/associate requirements. Priyanshu is strongly competitive.';
-      } else {
-        job.detectedYearsRequired = '1-3 years (Mid/Associate)';
-        job.experienceVerdict = 'JUSTIFIABLE_BY_SCALE';
-        job.isExperienceMatch = true;
-        job.hrExperienceNotes = 'Justifiable by Priyanshu\'s 14+ production EKS clusters across 7 AWS regions.';
-      }
+    // Check for junior / 0-3 years mentions
+    const juniorMatch = text.match(/\b(0|1|2|3)\s*(?:to|-)\s*(2|3|4)\s*(?:years?|yrs?)/i) ||
+      text.match(/\b(0|1|2)\+?\s*(?:years?|yrs?)/i) ||
+      titleLower.includes('junior') || titleLower.includes('associate') || titleLower.includes('entry');
+
+    if (juniorMatch) {
+      job.detectedYearsRequired = typeof juniorMatch === 'object' && juniorMatch[0] ? juniorMatch[0] : '0-2 years';
+      job.experienceVerdict = 'PERFECT_FIT';
+      job.isExperienceMatch = true;
+      job.hrExperienceNotes = 'Matches 0-2 years junior/associate requirements. Priyanshu is strongly competitive.';
+    } else {
+      job.detectedYearsRequired = '1-3 years (Mid/Associate)';
+      job.experienceVerdict = 'JUSTIFIABLE_BY_SCALE';
+      job.isExperienceMatch = true;
+      job.hrExperienceNotes = 'Justifiable by Priyanshu\'s 14+ production EKS clusters across 7 AWS regions.';
     }
 
     for (const kw of this.config.keywords) {
@@ -274,7 +276,7 @@ export class ScraperManager {
     job.matchedKeywords = matched;
     job.missingKeywords = missing;
 
-    if (!job.matchScore && job.experienceVerdict !== 'UNQUALIFIED_SENIOR') {
+    if (!job.matchScore) {
       let score = Math.min(95, Math.round(60 + (matched.length / 5) * 18));
       if (job.isDirectATS) score = Math.min(98, score + 5); // Priority boost for direct ATS
       job.matchScore = score;

@@ -16,6 +16,8 @@ import { NetworkFinder } from '../ai/network_finder.js';
 import { CredentialsStore } from '../storage/credentials_store.js';
 import { getIngestBookmarkletScript } from '../autofill/ingest_bookmarklet.js';
 import { detectATSProvider } from '../utils/ats_detector.js';
+import { isEligibleCandidateLocation } from '../utils/location_validator.js';
+import { validateRoleRelevance } from '../utils/role_validator.js';
 import { CandidateProfile, SearchConfig, JobListing } from '../types/index.js';
 
 const app = express();
@@ -393,16 +395,12 @@ app.post('/api/jobs/import', async (req, res) => {
       const atsProvider = ats.atsProvider || (isDirectATS ? 'Direct ATS' : undefined);
       if (isDirectATS) directAtsCount++;
 
-      // Strict AI / Keyword Relevance Screening
+      // Strict Location Filter (Candidate is in India; accepts India & Worldwide Remote only)
+      const locEligible = isEligibleCandidateLocation(location, raw.workMode);
+
+      // Strict Role Relevance Filter
+      const roleCheck = validateRoleRelevance(title, raw.description || '');
       const text = `${title} ${company} ${raw.description || ''}`.toLowerCase();
-      const titleLower = title.toLowerCase();
-
-      // Check for seniority mismatch
-      const isSeniorTitle = /\b(senior|sr\.|sr|lead|staff|principal|director|head of|vp|architect)\b/i.test(titleLower) &&
-        !titleLower.includes('junior') && !titleLower.includes('associate');
-
-      const highExpMatch = text.match(/\b([4-9]|1[0-5])\+?\s*(?:to|-)\s*(\d+)?\s*(?:years?|yrs?)/i) ||
-        text.match(/\b([4-9]|1[0-5])\+?\s*(?:years?|yrs?)\s*(?:of\s*)?(?:experience|exp)/i);
 
       let detectedExp = '1-3 years';
       let verdict: JobListing['experienceVerdict'] = 'JUSTIFIABLE_BY_SCALE';
@@ -411,16 +409,30 @@ app.post('/api/jobs/import', async (req, res) => {
       let score = 84;
       let rec: JobListing['recommendation'] = 'HIGHLY_RECOMMENDED';
 
-      if (isSeniorTitle || highExpMatch) {
-        detectedExp = highExpMatch ? highExpMatch[0] : '4+ years (Senior/Lead)';
+      if (!locEligible) {
+        detectedExp = 'Ineligible Location';
+        verdict = 'EXPERIENCE_GAP';
+        isMatch = false;
+        hrNotes = `Location (${location}) is outside India and not Global Remote.`;
+        score = 20;
+        rec = 'NOT_RECOMMENDED';
+      } else if (!roleCheck.isRelevant) {
+        detectedExp = 'Non-Infrastructure Role';
+        verdict = 'EXPERIENCE_GAP';
+        isMatch = false;
+        hrNotes = roleCheck.reason || 'Flagged as non-infrastructure position (not SRE/DevOps/Cloud/Platform).';
+        score = 20;
+        rec = 'NOT_RECOMMENDED';
+      } else if (roleCheck.isSeniorMismatch) {
+        detectedExp = '4+ years (Senior/Lead)';
         verdict = 'UNQUALIFIED_SENIOR';
         isMatch = false;
-        hrNotes = 'Requires senior/lead experience (4+ years). Filtered out as experience gap.';
+        hrNotes = roleCheck.reason || 'Requires senior/lead experience (4+ years). Filtered out as experience gap.';
         score = 35;
         rec = 'NOT_RECOMMENDED';
       } else {
         const juniorMatch = text.match(/\b(0|1|2|3)\s*(?:to|-)\s*(2|3|4)\s*(?:years?|yrs?)/i) ||
-          titleLower.includes('junior') || titleLower.includes('associate') || titleLower.includes('entry');
+          title.toLowerCase().includes('junior') || title.toLowerCase().includes('associate') || title.toLowerCase().includes('entry');
         if (juniorMatch) {
           detectedExp = '0-2 years (Early Career)';
           verdict = 'PERFECT_FIT';
@@ -476,6 +488,7 @@ app.post('/api/jobs/import', async (req, res) => {
     res.json({
       success: true,
       count: processedJobs.length,
+      importedCount: processedJobs.length,
       directAtsCount,
       added: result.added,
       updated: result.updated,

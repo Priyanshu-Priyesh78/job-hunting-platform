@@ -78,6 +78,12 @@
 
     <!-- ACTION BUTTONS TOOLBAR -->
     <div class="flex items-center space-x-2.5">
+      <!-- Paste from Clipboard -->
+      <button onclick="pasteFromClipboard()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-semibold transition shadow-xs">
+        <i data-lucide="clipboard" class="w-3.5 h-3.5 text-emerald-600"></i>
+        <span>Paste from Clipboard</span>
+      </button>
+
       <!-- 1-Click Autofill -->
       <button onclick="openAutofillModal()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs font-semibold transition shadow-xs">
         <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-600"></i>
@@ -87,7 +93,7 @@
       <!-- Platform Credentials & Cookies -->
       <button onclick="openCredentialsModal()" class="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-medium transition shadow-xs">
         <i data-lucide="key" class="w-3.5 h-3.5 text-slate-600"></i>
-        <span>Credentials & Cookies</span>
+        <span>Credentials & Ingest</span>
       </button>
 
       <!-- Google Sheets Sync -->
@@ -516,7 +522,35 @@
         <button onclick="closeCredentialsModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <!-- SECTION 1: 1-CLICK UNIVERSAL INGESTION BOOKMARKLET (RECOMMENDED) -->
+      <!-- SECTION 0: DIRECT 1-CLICK BACKGROUND SYNC (NO BOOKMARKLET NEEDED) -->
+      <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-200 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+            <i data-lucide="cloud-lightning" class="w-4 h-4 text-indigo-600"></i>
+            <span>Instant Backend Portal Sync (Zero Setup Needed)</span>
+          </h4>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-600 text-white uppercase">Direct Server APIs</span>
+        </div>
+        <p class="text-xs text-slate-600">
+          Our backend now queries official APIs and feeds directly with strict 1-3 yr India/Remote filtering:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+          <button onclick="triggerDirectPlatformSync('wellfound')" class="px-3 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs">
+            <i data-lucide="rocket" class="w-3.5 h-3.5 text-red-500"></i>
+            <span>Sync Wellfound (Startups)</span>
+          </button>
+          <button onclick="triggerDirectPlatformSync('instahyre')" class="px-3 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs">
+            <i data-lucide="check-circle" class="w-3.5 h-3.5 text-blue-500"></i>
+            <span>Sync Instahyre (0-2 Yrs)</span>
+          </button>
+          <button onclick="triggerDirectPlatformSync('direct_ats')" class="px-3 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span>Sync Direct ATS Portals</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SECTION 1: 1-CLICK UNIVERSAL INGESTION BOOKMARKLET (CLIPBOARD AUTO-SYNC) -->
       <div class="bg-gradient-to-r from-indigo-50 via-blue-50 to-emerald-50 p-4 rounded-xl border border-indigo-200 space-y-3">
         <div class="flex items-start space-x-3">
           <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0">
@@ -524,11 +558,11 @@
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wide">1-Click Browser Ingest Bookmarklet</h4>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white uppercase">Easiest Method</span>
+              <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Universal Browser Ingest Bookmarklet</h4>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white uppercase">Clipboard Bridge</span>
             </div>
             <p class="text-xs text-slate-600 mt-0.5">
-              Logged in to <strong>Simplify (simplify.jobs/jobs)</strong>, <strong>Wellfound</strong>, <strong>Instahyre</strong>, or <strong>LinkedIn</strong>? You don't need to copy complex session cookies!
+              Extracts all visible jobs from your open tab on <strong>Simplify</strong>, <strong>Wellfound</strong>, <strong>Instahyre</strong>, or <strong>LinkedIn</strong> and copies them to your clipboard. Switching back to JobHunter auto-imports them with zero clicks!
             </p>
           </div>
         </div>
@@ -547,23 +581,23 @@
         </div>
 
         <div class="text-[11px] text-slate-600 bg-white/70 p-2.5 rounded-lg border border-indigo-100 space-y-1">
-          <strong class="text-indigo-950">How to use:</strong>
+          <strong class="text-indigo-950">How it works:</strong>
           <ol class="list-decimal pl-4 space-y-0.5">
             <li>Drag the button above to your <strong>Bookmarks Bar</strong> (<kbd class="bg-white border px-1 rounded text-[10px]">Cmd+Shift+B</kbd> on Mac).</li>
-            <li>In a new tab, navigate to your authenticated <strong>Simplify Jobs feed</strong>, <strong>Wellfound</strong>, or <strong>Instahyre</strong> page.</li>
-            <li>Click <strong>📥 Ingest to JobHunter</strong> in your bookmarks bar. All visible jobs will be parsed, checked for 1-3 yr fit & Direct ATS links, and imported immediately!</li>
+            <li>In your logged-in tab on <strong>Wellfound</strong>, <strong>Simplify</strong>, or <strong>Instahyre</strong>, click the bookmarklet!</li>
+            <li>Switch back to this JobHunter tab: it will <strong>automatically read the extracted jobs and import them instantly</strong> (or click "Paste from Clipboard" in the navbar)!</li>
           </ol>
         </div>
       </div>
 
-      <!-- SECTION 2: QUICK URL / SINGLE JOB INGEST -->
+      <!-- SECTION 2: QUICK URL / BULK PASTE INGEST -->
       <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 text-xs">
-        <label class="block font-bold text-slate-800">Direct Job URL Instant Import</label>
+        <label class="block font-bold text-slate-800">Direct Job URL / Raw Paste Instant Import</label>
         <div class="flex gap-2">
-          <input type="text" id="quickImportUrlInput" placeholder="Paste any Greenhouse, Lever, Workday, Simplify, or LinkedIn job URL..." 
+          <input type="text" id="quickImportUrlInput" placeholder="Paste any Greenhouse, Lever, Workday, Wellfound, Simplify, or LinkedIn URL..." 
             class="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-indigo-500">
           <button onclick="quickImportJobUrl()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold shrink-0 transition shadow-xs">
-            Import Job
+            Import URL
           </button>
         </div>
       </div>
@@ -1927,6 +1961,160 @@
         alert('Bookmarklet not ready yet. Please try again.');
       }
     }
+
+    // TOAST HELPER
+    function showDashboardToast(msg, bg = '#0f172a') {
+      let toast = document.getElementById('dashboardToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'dashboardToast';
+        toast.className = 'fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl shadow-xl text-white text-xs font-semibold flex items-center gap-2 transition-all duration-300 transform translate-y-0 opacity-100 pointer-events-none';
+        document.body.appendChild(toast);
+      }
+      toast.style.backgroundColor = bg;
+      toast.innerHTML = `<span>${msg}</span>`;
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-4');
+      }, 4500);
+    }
+
+    // 1-CLICK CLIPBOARD BRIDGE (PASTE & AUTO-SYNC)
+    let lastImportedClipboardHash = '';
+
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (!text || text.trim().length === 0) {
+          alert('Clipboard is empty! Copy job listings or click the Ingest Bookmarklet on Wellfound, Simplify, or Instahyre first.');
+          return;
+        }
+        await processClipboardPayload(text, true);
+      } catch (err) {
+        const manualInput = prompt('Clipboard read access was blocked by browser permissions. Please paste your job data or URL below:');
+        if (manualInput) {
+          await processClipboardPayload(manualInput, true);
+        }
+      }
+    }
+
+    async function processClipboardPayload(rawText, isManual = false) {
+      try {
+        let payloadJobs = [];
+        const trimmed = rawText.trim();
+
+        if (trimmed.startsWith('{') && trimmed.includes('jobs')) {
+          const parsed = JSON.parse(trimmed);
+          if (Array.isArray(parsed.jobs)) {
+            payloadJobs = parsed.jobs;
+          }
+        } else if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+          const parsed = JSON.parse(trimmed);
+          if (Array.isArray(parsed)) {
+            payloadJobs = parsed;
+          }
+        } else if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+          payloadJobs = [{
+            url: trimmed,
+            title: 'Direct Portal Listing',
+            company: 'Company',
+            platform: 'direct_ats'
+          }];
+        }
+
+        if (payloadJobs.length === 0) {
+          if (isManual) alert('Could not recognize job data in clipboard. Please copy a job URL or click the Ingest Bookmarklet.');
+          return false;
+        }
+
+        const payloadHash = trimmed.slice(0, 100) + '_' + payloadJobs.length;
+        if (payloadHash === lastImportedClipboardHash) {
+          if (isManual) alert('These jobs have already been imported into your JobHunter dashboard!');
+          return false;
+        }
+
+        const res = await fetch('/api/jobs/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobs: payloadJobs, sourcePlatform: 'Clipboard Bridge' })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          lastImportedClipboardHash = payloadHash;
+          showDashboardToast(`🎉 Successfully imported ${data.importedCount || payloadJobs.length} jobs! (${data.directAtsCount || 0} Direct ATS)`, '#059669');
+          fetchJobs();
+          return true;
+        } else {
+          if (isManual) alert('Import error: ' + (data.message || 'Unknown error'));
+          return false;
+        }
+      } catch (e) {
+        if (isManual) alert('Failed to process clipboard content: ' + e.message);
+        return false;
+      }
+    }
+
+    // DIRECT 1-CLICK PLATFORM SYNC (WELLFOUND, INSTAHYRE, DIRECT ATS)
+    async function triggerDirectPlatformSync(platform) {
+      closeCredentialsModal();
+      const banner = document.getElementById('scanningBanner');
+      if (banner && !banner.classList.contains('hidden')) {
+        alert('A scan is already in progress! Please wait for it to complete.');
+        return;
+      }
+
+      showDashboardToast(`⚡ Scanning ${platform.toUpperCase()} with 1-3 yr India/Remote filters...`, '#4f46e5');
+
+      try {
+        await fetch('/api/scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roles: ['Site Reliability Engineer', 'DevOps Engineer', 'Cloud Engineer', 'Platform Engineer'],
+            location: 'India',
+            timeFilter: 'week',
+            platforms: [platform],
+            enableAI: true
+          })
+        });
+
+        const poll = setInterval(async () => {
+          const res = await fetch('/api/scan/progress');
+          const data = await res.json();
+          if (data.success) {
+            handleScanProgress(data.scanProgress);
+            if (!data.scanProgress.isScanning) {
+              clearInterval(poll);
+              fetchJobs();
+              showDashboardToast(`✅ Direct sync for ${platform.toUpperCase()} completed!`, '#059669');
+            }
+          }
+        }, 1500);
+      } catch (err) {
+        alert('Direct sync error: ' + err.message);
+      }
+    }
+
+    // AUTO-IMPORT ON TAB SWITCH (FOCUS)
+    window.addEventListener('focus', async () => {
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.readText) return;
+        const clip = await navigator.clipboard.readText();
+        if (clip && (clip.includes('"jobhunter_payload":true') || clip.includes('"jobhunter_payload": true'))) {
+          const hash = clip.slice(0, 100);
+          if (hash !== lastImportedClipboardHash) {
+            console.log('Detected fresh JobHunter bookmarklet payload in clipboard! Auto-importing...');
+            await processClipboardPayload(clip, false);
+          }
+        }
+      } catch (e) {
+        // Silently ignore if browser denies background clipboard read
+      }
+    });
 
     // INITIALIZATION
     window.addEventListener('DOMContentLoaded', () => {

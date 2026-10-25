@@ -3,73 +3,29 @@ import * as cheerio from 'cheerio';
 import { BaseScraper } from './base.js';
 import { JobListing, SearchConfig } from '../types/index.js';
 import { detectATSProvider } from '../utils/ats_detector.js';
+import { isEligibleCandidateLocation } from '../utils/location_validator.js';
+import { validateRoleRelevance } from '../utils/role_validator.js';
 
-// Top tech companies known for Greenhouse/Lever public boards
+// Top tech companies with Greenhouse/Lever public boards that hire in India or Worldwide Remote
 const KNOWN_GREENHOUSE_BOARDS = [
-  'cloudflare',
-  'datadog',
-  'stripe',
-  'gitlab',
-  'mongodb',
-  'canonical',
-  'figma',
-  'elastic',
-  'instacart',
-  'reddit',
-  'brex',
-  'robinhood',
-  'coinbase',
-  'rubrik',
+  'razorpay',
   'clevertap',
   'inmobi',
-  'razorpay'
+  'rubrik',
+  'canonical',
+  'gitlab',
+  'mongodb',
+  'datadog',
+  'cloudflare',
+  'figma',
+  'elastic',
+  'reddit',
+  'instacart'
 ];
 
 const KNOWN_LEVER_BOARDS = [
-  'palantir',
   'spotify',
   'atlassian'
-];
-
-const TARGET_ROLE_TERMS = [
-  'site reliability',
-  'sre',
-  'devops',
-  'cloud engineer',
-  'platform engineer',
-  'infrastructure engineer',
-  'systems engineer',
-  'cloud platform',
-  'production engineer',
-  'cloud operations',
-  'gitops'
-];
-
-const EXCLUDED_TERMS = [
-  'manager',
-  'director',
-  'vp',
-  'vice president',
-  'head of',
-  'chief',
-  'sales',
-  'account executive',
-  'analyst',
-  'fpa',
-  'finance',
-  'recruiter',
-  'recruiting',
-  'talent',
-  'counsel',
-  'legal',
-  'intern',
-  'distinguished',
-  'staff',
-  'principal',
-  'lead',
-  'senior',
-  'sr.',
-  'architect'
 ];
 
 export class DirectATSScraper extends BaseScraper {
@@ -83,7 +39,7 @@ export class DirectATSScraper extends BaseScraper {
     const jobs: JobListing[] = [];
     const limit = this.config.scraping.maxJobsPerPlatform || 30;
 
-    console.log(`[Direct ATS] Scanning Greenhouse, Lever, Workday & Ashby for 1-3 yr SRE/DevOps/Cloud openings...`);
+    console.log(`[Direct ATS] Scanning Greenhouse, Lever, Workday & Ashby for pure 1-3 yr SRE/DevOps/Cloud roles (India & Global Remote only)...`);
 
     // 1. Scan Greenhouse public job board APIs
     const greenhouseJobs = await this.scanGreenhouseBoards(query, location);
@@ -111,7 +67,7 @@ export class DirectATSScraper extends BaseScraper {
     }
 
     const result = Array.from(unique.values()).slice(0, limit);
-    console.log(`[Direct ATS] Successfully retrieved ${result.length} verified 1-3 yr Direct ATS openings`);
+    console.log(`[Direct ATS] Successfully retrieved ${result.length} verified 1-3 yr Direct ATS openings in India/Remote`);
     return result;
   }
 
@@ -130,25 +86,31 @@ export class DirectATSScraper extends BaseScraper {
         const boardJobs: JobListing[] = [];
         for (const raw of resp.data.jobs) {
           const title = (raw.title || '').trim();
-          const titleLower = title.toLowerCase();
 
-          // Reject excluded roles (managers, sales, seniors, leads, etc.)
-          if (EXCLUDED_TERMS.some((ex) => titleLower.includes(ex))) {
+          // 1. Strict Role Relevance Filter (DevOps, SRE, Cloud, Platform only - no hardware/enterprise apps)
+          const roleCheck = validateRoleRelevance(title);
+          if (!roleCheck.isRelevant) {
             continue;
           }
 
-          // Match infra / SRE / DevOps / Cloud / Platform
-          const matchesInfra = TARGET_ROLE_TERMS.some((t) => titleLower.includes(t));
-          if (!matchesInfra) {
-            continue;
-          }
-
-          const loc = raw.location?.name || 'Remote / Multiple Locations';
+          // 2. Strict Location Filter (India or Global Remote only - reject US/Canada In-Office/Hybrid)
+          const loc = raw.location?.name || 'India / Remote';
           const locLower = loc.toLowerCase();
+          const workMode: 'Remote' | 'Hybrid' | 'On-site' = locLower.includes('remote') || locLower.includes('home based')
+            ? 'Remote'
+            : locLower.includes('hybrid')
+            ? 'Hybrid'
+            : 'On-site';
+
+          if (!isEligibleCandidateLocation(loc, workMode)) {
+            continue;
+          }
 
           const appUrl = raw.absolute_url || `https://boards.greenhouse.io/${board}/jobs/${raw.id}`;
           const atsInfo = detectATSProvider(appUrl);
           const companyName = raw.company_name || board.charAt(0).toUpperCase() + board.slice(1);
+
+          const isSenior = roleCheck.isSeniorMismatch;
 
           boardJobs.push({
             id: `gh_${board}_${raw.id}`,
@@ -156,20 +118,22 @@ export class DirectATSScraper extends BaseScraper {
             title,
             company: companyName,
             location: loc,
-            experienceRequired: '1-3 years (Direct Company Portal)',
-            detectedYearsRequired: '1-3 years',
-            experienceVerdict: 'PERFECT_FIT',
-            hrExperienceNotes: `Direct Greenhouse opening at ${companyName}. Screened for 1-3 years infrastructure fit. High priority career portal.`,
+            experienceRequired: isSenior ? '4+ years (Senior)' : '1-3 years (Direct Company Portal)',
+            detectedYearsRequired: isSenior ? '4+ years' : '1-3 years',
+            experienceVerdict: isSenior ? 'UNQUALIFIED_SENIOR' : 'PERFECT_FIT',
+            hrExperienceNotes: isSenior
+              ? 'Role demands senior level experience.'
+              : `Direct Greenhouse opening at ${companyName}. Screened for 1-3 yrs SRE/DevOps fit in India/Remote.`,
             isDirectATS: true,
             atsProvider: atsInfo.atsProvider || 'Greenhouse',
             url: appUrl,
             description: `${title} at ${companyName}. Location: ${loc}. Direct Greenhouse career portal opening. Core focus on cloud infrastructure, Kubernetes, distributed systems and automation.`,
-            matchScore: 88,
-            recommendation: 'HIGHLY_RECOMMENDED',
-            matchedKeywords: ['Kubernetes', 'Linux', 'AWS', 'GitOps', 'CI/CD', 'Distributed Systems', 'Observability'],
+            matchScore: isSenior ? 35 : 90,
+            recommendation: isSenior ? 'NOT_RECOMMENDED' : 'HIGHLY_RECOMMENDED',
+            matchedKeywords: ['Kubernetes', 'Linux', 'AWS', 'GitOps', 'CI/CD', 'Observability'],
             postedDate: raw.updated_at ? `Updated ${raw.updated_at.split('T')[0]}` : 'Recently',
             status: 'NEW',
-            workMode: locLower.includes('remote') || locLower.includes('home based') ? 'Remote' : locLower.includes('hybrid') ? 'Hybrid' : 'Unspecified'
+            workMode
           });
         }
         return boardJobs;
@@ -203,21 +167,23 @@ export class DirectATSScraper extends BaseScraper {
         const boardJobs: JobListing[] = [];
         for (const raw of resp.data) {
           const title = (raw.text || '').trim();
-          const titleLower = title.toLowerCase();
 
-          if (EXCLUDED_TERMS.some((ex) => titleLower.includes(ex))) {
-            continue;
-          }
-
-          const matchesInfra = TARGET_ROLE_TERMS.some((t) => titleLower.includes(t));
-          if (!matchesInfra) {
+          const roleCheck = validateRoleRelevance(title);
+          if (!roleCheck.isRelevant) {
             continue;
           }
 
           const loc = raw.categories?.location || 'Remote';
+          const workMode: 'Remote' | 'Hybrid' | 'On-site' = (raw.workplaceType || '').toLowerCase().includes('remote') ? 'Remote' : 'On-site';
+
+          if (!isEligibleCandidateLocation(loc, workMode)) {
+            continue;
+          }
+
           const appUrl = raw.hostedUrl || raw.applyUrl;
           const atsInfo = detectATSProvider(appUrl);
           const companyName = board.charAt(0).toUpperCase() + board.slice(1);
+          const isSenior = roleCheck.isSeniorMismatch;
 
           boardJobs.push({
             id: `lever_${board}_${raw.id}`,
@@ -225,20 +191,20 @@ export class DirectATSScraper extends BaseScraper {
             title,
             company: companyName,
             location: loc,
-            experienceRequired: '1-3 years (Direct Company Portal)',
-            detectedYearsRequired: '1-3 years',
-            experienceVerdict: 'PERFECT_FIT',
-            hrExperienceNotes: `Direct Lever career portal posting at ${companyName}. 1-3 years experience matched.`,
+            experienceRequired: isSenior ? '4+ years (Senior)' : '1-3 years (Direct Company Portal)',
+            detectedYearsRequired: isSenior ? '4+ years' : '1-3 years',
+            experienceVerdict: isSenior ? 'UNQUALIFIED_SENIOR' : 'PERFECT_FIT',
+            hrExperienceNotes: isSenior ? 'Demands senior level.' : `Direct Lever posting at ${companyName}. 1-3 years experience matched.`,
             isDirectATS: true,
             atsProvider: atsInfo.atsProvider || 'Lever',
             url: appUrl,
             description: `${title} at ${companyName}. Location: ${loc}. Direct Lever ATS posting.`,
-            matchScore: 87,
-            recommendation: 'HIGHLY_RECOMMENDED',
+            matchScore: isSenior ? 35 : 88,
+            recommendation: isSenior ? 'NOT_RECOMMENDED' : 'HIGHLY_RECOMMENDED',
             matchedKeywords: ['Cloud', 'Kubernetes', 'Linux', 'DevOps', 'CI/CD'],
             postedDate: raw.createdAt ? new Date(raw.createdAt).toISOString().split('T')[0] : 'Recently',
             status: 'NEW',
-            workMode: (raw.workplaceType || '').toLowerCase().includes('remote') ? 'Remote' : 'Unspecified'
+            workMode
           });
         }
         return boardJobs;
@@ -281,21 +247,16 @@ export class DirectATSScraper extends BaseScraper {
 
         if (!role || !company || !appLink) return;
 
-        // Check if it's a direct ATS
         const ats = detectATSProvider(appLink);
         if (!ats.isDirectATS) return;
 
-        const roleLower = role.toLowerCase();
-        if (EXCLUDED_TERMS.some((ex) => roleLower.includes(ex))) return;
+        // Role check
+        const roleCheck = validateRoleRelevance(role);
+        if (!roleCheck.isRelevant) return;
 
-        const matchesInfra = TARGET_ROLE_TERMS.some((t) => roleLower.includes(t)) ||
-          roleLower.includes('devops') ||
-          roleLower.includes('cloud') ||
-          roleLower.includes('site reliability') ||
-          roleLower.includes('systems engineer') ||
-          roleLower.includes('infrastructure');
-
-        if (!matchesInfra) return;
+        // Location check (India or Remote only)
+        const isRemote = loc.toLowerCase().includes('remote');
+        if (!isEligibleCandidateLocation(loc, isRemote ? 'Remote' : 'In-Office')) return;
 
         const jobId = `ats_${company}_${role}`.toLowerCase().replace(/[^a-z0-9]/g, '_');
 
@@ -308,17 +269,17 @@ export class DirectATSScraper extends BaseScraper {
           experienceRequired: '0-2 years (Direct Portal Early Career)',
           detectedYearsRequired: '0-2 years',
           experienceVerdict: 'PERFECT_FIT',
-          hrExperienceNotes: `Direct ${ats.atsProvider} portal role at ${company}. Verified 0-2 yrs candidate match.`,
+          hrExperienceNotes: `Direct ${ats.atsProvider} portal role at ${company}. Verified 0-2 yrs candidate match in India/Remote.`,
           isDirectATS: true,
           atsProvider: ats.atsProvider,
           url: appLink,
           description: `${role} at ${company}. Location: ${loc}. Direct ${ats.atsProvider} career portal link.`,
-          matchScore: 90,
+          matchScore: 92,
           recommendation: 'HIGHLY_RECOMMENDED',
           matchedKeywords: ['Kubernetes', 'Cloud Infrastructure', 'Linux', 'AWS', 'CI/CD'],
           postedDate: age ? `Posted ${age} ago` : 'Recent',
           status: 'NEW',
-          workMode: loc.toLowerCase().includes('remote') ? 'Remote' : 'Unspecified'
+          workMode: isRemote ? 'Remote' : 'Unspecified'
         });
       });
     } catch (err: any) {

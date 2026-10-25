@@ -66,3 +66,4 @@ export function detectATSProvider(url: string = ''): ATSDetectionResult {
 
   return { isDirectATS: false, atsProvider: '' };
 }
+

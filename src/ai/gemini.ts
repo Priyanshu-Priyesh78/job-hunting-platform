@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
 import { CandidateProfile, JDAnalysisResult, JobListing } from '../types/index.js';
+import { validateRoleRelevance } from '../utils/role_validator.js';
+import { isEligibleCandidateLocation } from '../utils/location_validator.js';
 
 dotenv.config();
 
@@ -146,18 +148,34 @@ Provide ONLY the valid JSON response.`;
       parsed = JSON.parse(cleaned);
     }
 
-    // Safety guardrails for Senior / Staff / 5+ years positions
-    const titleLower = job.title.toLowerCase();
-    const isStrictSenior = /\b(senior|sr\.|sr|lead|staff|principal|director|head of|vp|architect)\b/i.test(titleLower) &&
-      !titleLower.includes('junior') && !titleLower.includes('associate');
-    const isSeniorYears = /\b([5-9]|1[0-5])\+?\s*(?:to|-)?\s*(\d+)?\s*(?:years?|yrs?)/i.test(parsed.detectedYearsRequired || '');
-
-    if (isStrictSenior || isSeniorYears) {
-      parsed.experienceVerdict = 'UNQUALIFIED_SENIOR';
+    // Safety guardrails for Non-Infra and Foreign Location
+    const roleCheck = validateRoleRelevance(job.title, job.description);
+    if (!roleCheck.isRelevant) {
+      parsed.experienceVerdict = 'EXPERIENCE_GAP';
       parsed.isExperienceMatch = false;
-      parsed.hrExperienceNotes = `Role strictly requires ${parsed.detectedYearsRequired || 'Senior/Staff experience'}. With 1.5 yrs total experience, ATS screening will filter this out as a senior grade mismatch.`;
-      parsed.matchScore = Math.min(parsed.matchScore ?? 35, 38);
+      parsed.hrExperienceNotes = roleCheck.reason || 'Flagged as non-infrastructure position (not SRE/DevOps/Cloud/Platform).';
+      parsed.matchScore = 20;
       parsed.recommendation = 'NOT_RECOMMENDED';
+    } else if (job.location && !isEligibleCandidateLocation(job.location)) {
+      parsed.experienceVerdict = 'EXPERIENCE_GAP';
+      parsed.isExperienceMatch = false;
+      parsed.hrExperienceNotes = `Location ${job.location} is ineligible: Candidate is based in India and eligible only for India-based or Global Remote roles.`;
+      parsed.matchScore = 20;
+      parsed.recommendation = 'NOT_RECOMMENDED';
+    } else {
+      // Safety guardrails for Senior / Staff / 5+ years positions
+      const titleLower = job.title.toLowerCase();
+      const isStrictSenior = roleCheck.isSeniorMismatch || (/\b(senior|sr\.|sr|lead|staff|principal|director|head of|vp|architect)\b/i.test(titleLower) &&
+        !titleLower.includes('junior') && !titleLower.includes('associate'));
+      const isSeniorYears = /\b([4-9]|1[0-5])\+?\s*(?:to|-)?\s*(\d+)?\s*(?:years?|yrs?)/i.test(parsed.detectedYearsRequired || '');
+
+      if (isStrictSenior || isSeniorYears) {
+        parsed.experienceVerdict = 'UNQUALIFIED_SENIOR';
+        parsed.isExperienceMatch = false;
+        parsed.hrExperienceNotes = `Role strictly requires ${parsed.detectedYearsRequired || 'Senior/Staff experience (4+ years)'}. With 1.5 yrs total experience, ATS screening will filter this out as a senior grade mismatch.`;
+        parsed.matchScore = Math.min(parsed.matchScore ?? 35, 38);
+        parsed.recommendation = 'NOT_RECOMMENDED';
+      }
     }
 
     return {
